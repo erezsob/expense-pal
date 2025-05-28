@@ -49,7 +49,7 @@ export const getGroupsForUser = query({
     const groupIds = userGroupMemberships.map((gm) => gm.groupId);
 
     const groups = await Promise.all(
-      groupIds.map((groupId) => ctx.db.get(groupId))
+      groupIds.map((groupId) => ctx.db.get(groupId)),
     );
 
     return groups.filter((g) => g !== null);
@@ -75,7 +75,7 @@ export const getGroupDetails = query({
     const membership = await ctx.db
       .query("groupMembers")
       .withIndex("by_groupId_and_userId", (q) =>
-        q.eq("groupId", args.groupId).eq("userId", userId)
+        q.eq("groupId", args.groupId).eq("userId", userId),
       )
       .unique();
 
@@ -98,9 +98,9 @@ export const getGroupDetails = query({
           _id: user?._id,
           _creationTime: user?._creationTime,
         };
-      })
+      }),
     );
-    
+
     return {
       ...group,
       members: memberUserDetails,
@@ -142,7 +142,7 @@ export const inviteUserToGroup = mutation({
     const existingMembership = await ctx.db
       .query("groupMembers")
       .withIndex("by_groupId_and_userId", (q) =>
-        q.eq("groupId", args.groupId).eq("userId", userToInvite._id)
+        q.eq("groupId", args.groupId).eq("userId", userToInvite._id),
       )
       .unique();
 
@@ -164,10 +164,14 @@ export const updateGroupSettings = mutation({
     groupId: v.id("groups"),
     name: v.optional(v.string()),
     currency: v.optional(v.string()),
-    defaultSplitRatio: v.optional(v.object({
-      type: v.union(v.literal("EQUAL"), v.literal("PERCENTAGES")),
-      percentages: v.optional(v.array(v.object({ userId: v.id("users"), share: v.number() }))),
-    })),
+    defaultSplitRatio: v.optional(
+      v.object({
+        type: v.union(v.literal("EQUAL"), v.literal("PERCENTAGES")),
+        percentages: v.optional(
+          v.array(v.object({ userId: v.id("users"), share: v.number() })),
+        ),
+      }),
+    ),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -182,30 +186,41 @@ export const updateGroupSettings = mutation({
 
     // Optional: Add permission check (e.g., only creator or admin can update)
     if (group.createdByUser !== userId) {
-        const member = await ctx.db.query("groupMembers")
-            .withIndex("by_groupId_and_userId", q => q.eq("groupId", args.groupId).eq("userId", userId))
-            .unique();
-        // Add role check here if roles are implemented, e.g. member.role === "admin"
-        if(!member){ // Basic check: must be a member
-             throw new Error("User not authorized to update this group's settings.");
-        }
+      const member = await ctx.db
+        .query("groupMembers")
+        .withIndex("by_groupId_and_userId", (q) =>
+          q.eq("groupId", args.groupId).eq("userId", userId),
+        )
+        .unique();
+      // Add role check here if roles are implemented, e.g. member.role === "admin"
+      if (!member) {
+        // Basic check: must be a member
+        throw new Error("User not authorized to update this group's settings.");
+      }
     }
-    
+
     const { groupId, ...updates } = args;
 
     if (updates.defaultSplitRatio?.type === "PERCENTAGES") {
-      if (!updates.defaultSplitRatio.percentages || updates.defaultSplitRatio.percentages.length === 0) {
-        throw new Error("Percentages must be provided for PERCENTAGES split type.");
+      if (
+        !updates.defaultSplitRatio.percentages ||
+        updates.defaultSplitRatio.percentages.length === 0
+      ) {
+        throw new Error(
+          "Percentages must be provided for PERCENTAGES split type.",
+        );
       }
-      const totalShare = updates.defaultSplitRatio.percentages.reduce((sum, p) => sum + p.share, 0);
+      const totalShare = updates.defaultSplitRatio.percentages.reduce(
+        (sum, p) => sum + p.share,
+        0,
+      );
       // Allowing for small floating point inaccuracies
       if (Math.abs(totalShare - 1.0) > 0.001) {
         throw new Error("Total percentage shares must sum up to 1 (or 100%).");
       }
     }
 
-
     await ctx.db.patch(args.groupId, updates);
     return { success: true };
-  }
+  },
 });

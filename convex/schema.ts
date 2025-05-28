@@ -13,7 +13,9 @@ const applicationTables = {
       type: v.union(v.literal("EQUAL"), v.literal("PERCENTAGES")),
       // percentages array will be used if type is "PERCENTAGES"
       // each object in percentages should have userId and share (e.g. 0.5 for 50%)
-      percentages: v.optional(v.array(v.object({ userId: v.id("users"), share: v.number() }))),
+      percentages: v.optional(
+        v.array(v.object({ userId: v.id("users"), share: v.number() })),
+      ),
     }),
     createdByUser: v.id("users"),
   }),
@@ -34,18 +36,23 @@ const applicationTables = {
     paidByUserId: v.id("users"),
     date: v.int64(), // Store as timestamp
     // Optional: specific split for this expense, overriding group default
-    splitConfig: v.optional(v.object({
-      type: v.union(v.literal("EQUAL"), v.literal("PERCENTAGES"), v.literal("FIXED_AMOUNTS")),
-      shares: v.array(
-        v.object({
-          userId: v.id("users"),
-          // share will be percentage (0-1) or fixed amount depending on type
-          value: v.number(),
-        })
-      ),
-    })),
-  })
-    .index("by_groupId", ["groupId"]),
+    splitConfig: v.optional(
+      v.object({
+        type: v.union(
+          v.literal("EQUAL"),
+          v.literal("PERCENTAGES"),
+          v.literal("FIXED_AMOUNTS"),
+        ),
+        shares: v.array(
+          v.object({
+            userId: v.id("users"),
+            // share will be percentage (0-1) or fixed amount depending on type
+            value: v.number(),
+          }),
+        ),
+      }),
+    ),
+  }).index("by_groupId", ["groupId"]),
 
   payments: defineTable({
     groupId: v.id("groups"),

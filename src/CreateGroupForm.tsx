@@ -27,7 +27,9 @@ export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
       setCurrency("USD");
       onSuccess(groupId);
     } catch (error: any) {
-      toast.error(`Failed to create group: ${error.message || error.toString()}`);
+      toast.error(
+        `Failed to create group: ${error.message || error.toString()}`,
+      );
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -37,7 +39,10 @@ export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="groupName" className="block text-sm font-medium text-on-surface-secondary mb-1">
+        <label
+          htmlFor="groupName"
+          className="block text-sm font-medium text-on-surface-secondary mb-1"
+        >
           Group Name
         </label>
         <input
@@ -51,7 +56,10 @@ export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
         />
       </div>
       <div>
-        <label htmlFor="currency" className="block text-sm font-medium text-on-surface-secondary mb-1">
+        <label
+          htmlFor="currency"
+          className="block text-sm font-medium text-on-surface-secondary mb-1"
+        >
           Currency
         </label>
         <input
@@ -67,7 +75,7 @@ export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
       </div>
       <button
         type="submit"
-        className={`btn btn-primary w-full ${isLoading ? 'btn-disabled' : ''}`}
+        className={`btn btn-primary w-full ${isLoading ? "btn-disabled" : ""}`}
         disabled={isLoading || !name.trim() || !currency.trim()}
       >
         {isLoading ? "Creating..." : "Create Group"}

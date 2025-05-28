@@ -4,14 +4,17 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { Doc, Id } from "./_generated/dataModel";
 
 // Define the expected return type for enriched payments
-export type EnrichedPayment = Doc<"payments"> & { payerName: string; payeeName: string };
+export type EnrichedPayment = Doc<"payments"> & {
+  payerName: string;
+  payeeName: string;
+};
 
 export const recordPayment = mutation({
   args: {
     groupId: v.id("groups"),
     payeeUserId: v.id("users"),
     amount: v.number(),
-    date: v.optional(v.int64()), 
+    date: v.optional(v.int64()),
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -23,7 +26,7 @@ export const recordPayment = mutation({
     if (payerUserId === args.payeeUserId) {
       throw new Error("Payer and payee cannot be the same person.");
     }
-    
+
     if (args.amount <= 0) {
       throw new Error("Payment amount must be positive.");
     }
@@ -31,14 +34,14 @@ export const recordPayment = mutation({
     const payerMembership = await ctx.db
       .query("groupMembers")
       .withIndex("by_groupId_and_userId", (q) =>
-        q.eq("groupId", args.groupId).eq("userId", payerUserId)
+        q.eq("groupId", args.groupId).eq("userId", payerUserId),
       )
       .unique();
 
     const payeeMembership = await ctx.db
       .query("groupMembers")
       .withIndex("by_groupId_and_userId", (q) =>
-        q.eq("groupId", args.groupId).eq("userId", args.payeeUserId)
+        q.eq("groupId", args.groupId).eq("userId", args.payeeUserId),
       )
       .unique();
 
@@ -63,7 +66,8 @@ export const getPaymentsForGroup = query({
   args: {
     groupId: v.id("groups"),
   },
-  handler: async (ctx, args): Promise<EnrichedPayment[]> => { // Explicit return type
+  handler: async (ctx, args): Promise<EnrichedPayment[]> => {
+    // Explicit return type
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new Error("User not authenticated");
@@ -72,7 +76,7 @@ export const getPaymentsForGroup = query({
     const membership = await ctx.db
       .query("groupMembers")
       .withIndex("by_groupId_and_userId", (q) =>
-        q.eq("groupId", args.groupId).eq("userId", userId)
+        q.eq("groupId", args.groupId).eq("userId", userId),
       )
       .unique();
 
@@ -95,7 +99,7 @@ export const getPaymentsForGroup = query({
           payerName: payer?.name ?? payer?.email ?? "Unknown User",
           payeeName: payee?.name ?? payee?.email ?? "Unknown User",
         };
-      })
+      }),
     );
     return enrichedPayments;
   },

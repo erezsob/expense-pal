@@ -11,16 +11,22 @@ export const addExpense = mutation({
     groupId: v.id("groups"),
     description: v.string(),
     amount: v.number(),
-    date: v.optional(v.int64()), 
-    splitConfig: v.optional(v.object({
-      type: v.union(v.literal("EQUAL"), v.literal("PERCENTAGES"), v.literal("FIXED_AMOUNTS")),
-      shares: v.array(
-        v.object({
-          userId: v.id("users"),
-          value: v.number(), 
-        })
-      ),
-    })),
+    date: v.optional(v.int64()),
+    splitConfig: v.optional(
+      v.object({
+        type: v.union(
+          v.literal("EQUAL"),
+          v.literal("PERCENTAGES"),
+          v.literal("FIXED_AMOUNTS"),
+        ),
+        shares: v.array(
+          v.object({
+            userId: v.id("users"),
+            value: v.number(),
+          }),
+        ),
+      }),
+    ),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -31,39 +37,50 @@ export const addExpense = mutation({
     const membership = await ctx.db
       .query("groupMembers")
       .withIndex("by_groupId_and_userId", (q) =>
-        q.eq("groupId", args.groupId).eq("userId", userId)
+        q.eq("groupId", args.groupId).eq("userId", userId),
       )
       .unique();
 
     if (!membership) {
       throw new Error("User is not a member of this group.");
     }
-    
+
     if (args.amount <= 0) {
       throw new Error("Expense amount must be positive.");
     }
 
     if (args.splitConfig) {
-      const groupMembers = await ctx.db.query("groupMembers")
-        .withIndex("by_groupId", q => q.eq("groupId", args.groupId))
+      const groupMembers = await ctx.db
+        .query("groupMembers")
+        .withIndex("by_groupId", (q) => q.eq("groupId", args.groupId))
         .collect();
-      const groupMemberIds = groupMembers.map(gm => gm.userId);
+      const groupMemberIds = groupMembers.map((gm) => gm.userId);
 
       for (const share of args.splitConfig.shares) {
-        if (!groupMemberIds.some(id => id === share.userId)) {
-          throw new Error(`User ${share.userId} in split configuration is not a member of the group.`);
+        if (!groupMemberIds.some((id) => id === share.userId)) {
+          throw new Error(
+            `User ${share.userId} in split configuration is not a member of the group.`,
+          );
         }
       }
 
       if (args.splitConfig.type === "PERCENTAGES") {
-        const totalPercentage = args.splitConfig.shares.reduce((sum, s) => sum + s.value, 0);
-        if (Math.abs(totalPercentage - 1.0) > 0.001) { 
+        const totalPercentage = args.splitConfig.shares.reduce(
+          (sum, s) => sum + s.value,
+          0,
+        );
+        if (Math.abs(totalPercentage - 1.0) > 0.001) {
           throw new Error("Total percentage shares must sum to 1.0 (or 100%).");
         }
       } else if (args.splitConfig.type === "FIXED_AMOUNTS") {
-        const totalFixedAmount = args.splitConfig.shares.reduce((sum, s) => sum + s.value, 0);
-        if (Math.abs(totalFixedAmount - args.amount) > 0.001) { 
-          throw new Error("Total fixed amounts must sum to the expense amount.");
+        const totalFixedAmount = args.splitConfig.shares.reduce(
+          (sum, s) => sum + s.value,
+          0,
+        );
+        if (Math.abs(totalFixedAmount - args.amount) > 0.001) {
+          throw new Error(
+            "Total fixed amounts must sum to the expense amount.",
+          );
         }
       }
     }
@@ -85,7 +102,8 @@ export const getExpensesForGroup = query({
   args: {
     groupId: v.id("groups"),
   },
-  handler: async (ctx, args): Promise<EnrichedExpense[]> => { // Explicit return type
+  handler: async (ctx, args): Promise<EnrichedExpense[]> => {
+    // Explicit return type
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new Error("User not authenticated");
@@ -94,7 +112,7 @@ export const getExpensesForGroup = query({
     const membership = await ctx.db
       .query("groupMembers")
       .withIndex("by_groupId_and_userId", (q) =>
-        q.eq("groupId", args.groupId).eq("userId", userId)
+        q.eq("groupId", args.groupId).eq("userId", userId),
       )
       .unique();
 
@@ -105,7 +123,7 @@ export const getExpensesForGroup = query({
     const expenses = await ctx.db
       .query("expenses")
       .withIndex("by_groupId", (q) => q.eq("groupId", args.groupId))
-      .order("desc") 
+      .order("desc")
       .collect();
 
     const enrichedExpenses: EnrichedExpense[] = await Promise.all(
@@ -115,7 +133,7 @@ export const getExpensesForGroup = query({
           ...expense,
           paidByName: payer?.name ?? payer?.email ?? "Unknown User",
         };
-      })
+      }),
     );
     return enrichedExpenses;
   },
