@@ -1,12 +1,17 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Id } from "../../convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+import { api } from "../../convex/_generated/api";
 import { FormEvent, useState } from "react";
 import { toast } from "sonner";
-import { Doc } from "../convex/_generated/dataModel";
-import type { EnrichedExpense } from "../convex/expenses";
-import type { EnrichedPayment } from "../convex/payments";
-import type { GroupBalances } from "../convex/balances";
+import { Doc } from "../../convex/_generated/dataModel";
+import type { EnrichedExpense } from "../../convex/expenses";
+import type { EnrichedPayment } from "../../convex/payments";
+import type { GroupBalances } from "../../convex/balances";
+
+export const Route = createFileRoute("/groups/$groupId")({
+  component: GroupView,
+});
 
 interface GroupViewProps {
   groupId: Id<"groups">;
