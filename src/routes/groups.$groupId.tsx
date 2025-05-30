@@ -1,33 +1,33 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Id } from "../../convex/_generated/dataModel";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { FormEvent, useState } from "react";
-import { toast } from "sonner";
-import { Doc } from "../../convex/_generated/dataModel";
-import type { EnrichedExpense } from "../../convex/expenses";
-import type { EnrichedPayment } from "../../convex/payments";
-import type { GroupBalances } from "../../convex/balances";
+import { createFileRoute } from '@tanstack/react-router'
+import { Id } from '../../convex/_generated/dataModel'
+import { useMutation, useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
+import { FormEvent, useState } from 'react'
+import { toast } from 'sonner'
+import { Doc } from '../../convex/_generated/dataModel'
+import type { EnrichedExpense } from '../../convex/expenses'
+import type { EnrichedPayment } from '../../convex/payments'
+import type { GroupBalances } from '../../convex/balances'
 
-export const Route = createFileRoute("/groups/$groupId")({
+export const Route = createFileRoute('/groups/$groupId')({
   component: GroupView,
-});
+})
 
 interface GroupViewProps {
-  groupId: Id<"groups">;
-  onBack: () => void;
+  groupId: Id<'groups'>
+  onBack: () => void
 }
 
 export function GroupView({ groupId, onBack }: GroupViewProps) {
-  const groupDetails = useQuery(api.groups.getGroupDetails, { groupId });
-  const expenses = useQuery(api.expenses.getExpensesForGroup, { groupId });
-  const payments = useQuery(api.payments.getPaymentsForGroup, { groupId });
-  const balances = useQuery(api.balances.getGroupBalances, { groupId });
-  const loggedInUser = useQuery(api.auth.loggedInUser);
+  const groupDetails = useQuery(api.groups.getGroupDetails, { groupId })
+  const expenses = useQuery(api.expenses.getExpensesForGroup, { groupId })
+  const payments = useQuery(api.payments.getPaymentsForGroup, { groupId })
+  const balances = useQuery(api.balances.getGroupBalances, { groupId })
+  const loggedInUser = useQuery(api.auth.loggedInUser)
 
   const [activeTab, setActiveTab] = useState<
-    "expenses" | "payments" | "members" | "balances" | "settings"
-  >("expenses");
+    'expenses' | 'payments' | 'members' | 'balances' | 'settings'
+  >('expenses')
 
   if (
     groupDetails === undefined ||
@@ -40,24 +40,24 @@ export function GroupView({ groupId, onBack }: GroupViewProps) {
       <div className="flex justify-center items-center h-64">
         <div className="spinner"></div>
       </div>
-    );
+    )
   }
 
   if (!loggedInUser) {
-    onBack(); // Should not happen if app flow is correct, but good for safety
-    return null;
+    onBack() // Should not happen if app flow is correct, but good for safety
+    return null
   }
 
   if (!groupDetails || balances === null) {
-    toast.error("Group details or balances could not be loaded.");
-    onBack();
+    toast.error('Group details or balances could not be loaded.')
+    onBack()
     return (
       <div className="flex justify-center items-center h-64">
         <p className="text-error">
           Error loading group data. Please try again.
         </p>
       </div>
-    );
+    )
   }
 
   return (
@@ -76,13 +76,13 @@ export function GroupView({ groupId, onBack }: GroupViewProps) {
 
       <div className="flex border-b border-light">
         {(
-          ["expenses", "payments", "members", "balances", "settings"] as const
+          ['expenses', 'payments', 'members', 'balances', 'settings'] as const
         ).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`tab-button capitalize ${
-              activeTab === tab ? "tab-button-active" : "tab-button-inactive"
+              activeTab === tab ? 'tab-button-active' : 'tab-button-inactive'
             }`}
           >
             {tab}
@@ -91,68 +91,68 @@ export function GroupView({ groupId, onBack }: GroupViewProps) {
       </div>
 
       <div className="mt-6">
-        {activeTab === "expenses" && expenses && (
+        {activeTab === 'expenses' && expenses && (
           <ExpensesTab
             groupId={groupId}
             expenses={expenses}
             members={
-              groupDetails.members as { userId: Id<"users">; name: string }[]
+              groupDetails.members as { userId: Id<'users'>; name: string }[]
             }
             currency={groupDetails.currency}
             loggedInUserId={loggedInUser._id}
           />
         )}
-        {activeTab === "payments" && payments && (
+        {activeTab === 'payments' && payments && (
           <PaymentsTab
             groupId={groupId}
             payments={payments}
             members={
-              groupDetails.members as { userId: Id<"users">; name: string }[]
+              groupDetails.members as { userId: Id<'users'>; name: string }[]
             }
             currency={groupDetails.currency}
             loggedInUserId={loggedInUser._id}
           />
         )}
-        {activeTab === "members" && (
+        {activeTab === 'members' && (
           <MembersTab
             groupId={groupId}
             members={
               groupDetails.members as {
-                userId: Id<"users">;
-                name: string;
-                email?: string | null;
+                userId: Id<'users'>
+                name: string
+                email?: string | null
               }[]
             }
           />
         )}
-        {activeTab === "balances" && balances && (
+        {activeTab === 'balances' && balances && (
           <BalancesTab balances={balances} />
         )}
-        {activeTab === "settings" && (
+        {activeTab === 'settings' && (
           <SettingsTab
             groupDetails={
-              groupDetails as Doc<"groups"> & {
+              groupDetails as Doc<'groups'> & {
                 members: {
-                  userId: Id<"users">;
-                  name: string;
-                  email?: string | null;
-                }[];
+                  userId: Id<'users'>
+                  name: string
+                  email?: string | null
+                }[]
               }
             }
           />
         )}
       </div>
     </div>
-  );
+  )
 }
 
 // --- Expenses Tab ---
 interface ExpensesTabProps {
-  groupId: Id<"groups">;
-  expenses: EnrichedExpense[];
-  members: { userId: Id<"users">; name: string }[];
-  currency: string;
-  loggedInUserId: Id<"users">;
+  groupId: Id<'groups'>
+  expenses: EnrichedExpense[]
+  members: { userId: Id<'users'>; name: string }[]
+  currency: string
+  loggedInUserId: Id<'users'>
 }
 function ExpensesTab({
   groupId,
@@ -161,43 +161,43 @@ function ExpensesTab({
   currency,
   loggedInUserId,
 }: ExpensesTabProps) {
-  const addExpenseMutation = useMutation(api.expenses.addExpense);
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [showAddExpenseForm, setShowAddExpenseForm] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const addExpenseMutation = useMutation(api.expenses.addExpense)
+  const [description, setDescription] = useState('')
+  const [amount, setAmount] = useState('')
+  const [showAddExpenseForm, setShowAddExpenseForm] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleAddExpense = async (e: FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!description.trim() || !amount.trim() || parseFloat(amount) <= 0) {
-      toast.error("Valid description and positive amount are required.");
-      return;
+      toast.error('Valid description and positive amount are required.')
+      return
     }
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       await addExpenseMutation({
         groupId,
         description,
         amount: parseFloat(amount),
-      });
-      toast.success("Expense added!");
-      setDescription("");
-      setAmount("");
-      setShowAddExpenseForm(false);
+      })
+      toast.success('Expense added!')
+      setDescription('')
+      setAmount('')
+      setShowAddExpenseForm(false)
     } catch (error: any) {
-      toast.error(`Failed to add expense: ${error.message}`);
+      toast.error(`Failed to add expense: ${error.message}`)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="space-y-4">
       <button
         onClick={() => setShowAddExpenseForm(!showAddExpenseForm)}
-        className={`btn ${showAddExpenseForm ? "btn-secondary" : "btn-success"}`}
+        className={`btn ${showAddExpenseForm ? 'btn-secondary' : 'btn-success'}`}
       >
-        {showAddExpenseForm ? "Cancel" : "Add New Expense"}
+        {showAddExpenseForm ? 'Cancel' : 'Add New Expense'}
       </button>
 
       {showAddExpenseForm && (
@@ -240,10 +240,10 @@ function ExpensesTab({
           </div>
           <button
             type="submit"
-            className={`btn btn-primary ${isLoading ? "btn-disabled" : ""}`}
+            className={`btn btn-primary ${isLoading ? 'btn-disabled' : ''}`}
             disabled={isLoading}
           >
-            {isLoading ? "Adding..." : "Add Expense"}
+            {isLoading ? 'Adding...' : 'Add Expense'}
           </button>
         </form>
       )}
@@ -281,16 +281,16 @@ function ExpensesTab({
         </ul>
       )}
     </div>
-  );
+  )
 }
 
 // --- Payments Tab ---
 interface PaymentsTabProps {
-  groupId: Id<"groups">;
-  payments: EnrichedPayment[];
-  members: { userId: Id<"users">; name: string }[];
-  currency: string;
-  loggedInUserId: Id<"users">;
+  groupId: Id<'groups'>
+  payments: EnrichedPayment[]
+  members: { userId: Id<'users'>; name: string }[]
+  currency: string
+  loggedInUserId: Id<'users'>
 }
 function PaymentsTab({
   groupId,
@@ -299,48 +299,48 @@ function PaymentsTab({
   currency,
   loggedInUserId,
 }: PaymentsTabProps) {
-  const recordPaymentMutation = useMutation(api.payments.recordPayment);
-  const [payeeUserId, setPayeeUserId] = useState<Id<"users"> | "">("");
-  const [amount, setAmount] = useState("");
-  const [notes, setNotes] = useState("");
-  const [showAddPaymentForm, setShowAddPaymentForm] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const recordPaymentMutation = useMutation(api.payments.recordPayment)
+  const [payeeUserId, setPayeeUserId] = useState<Id<'users'> | ''>('')
+  const [amount, setAmount] = useState('')
+  const [notes, setNotes] = useState('')
+  const [showAddPaymentForm, setShowAddPaymentForm] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleRecordPayment = async (e: FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!payeeUserId || !amount.trim() || parseFloat(amount) <= 0) {
-      toast.error("Valid payee and positive amount are required.");
-      return;
+      toast.error('Valid payee and positive amount are required.')
+      return
     }
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       await recordPaymentMutation({
         groupId,
-        payeeUserId: payeeUserId as Id<"users">,
+        payeeUserId: payeeUserId as Id<'users'>,
         amount: parseFloat(amount),
         notes: notes.trim() || undefined,
-      });
-      toast.success("Payment recorded!");
-      setPayeeUserId("");
-      setAmount("");
-      setNotes("");
-      setShowAddPaymentForm(false);
+      })
+      toast.success('Payment recorded!')
+      setPayeeUserId('')
+      setAmount('')
+      setNotes('')
+      setShowAddPaymentForm(false)
     } catch (error: any) {
-      toast.error(`Failed to record payment: ${error.message}`);
+      toast.error(`Failed to record payment: ${error.message}`)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
-  const availablePayees = members.filter((m) => m.userId !== loggedInUserId);
+  const availablePayees = members.filter((m) => m.userId !== loggedInUserId)
 
   return (
     <div className="space-y-4">
       <button
         onClick={() => setShowAddPaymentForm(!showAddPaymentForm)}
-        className={`btn ${showAddPaymentForm ? "btn-secondary" : "bg-accent text-accent-contrast hover:bg-accent-dark focus:ring-accent"}`}
+        className={`btn ${showAddPaymentForm ? 'btn-secondary' : 'bg-accent text-accent-contrast hover:bg-accent-dark focus:ring-accent'}`}
       >
-        {showAddPaymentForm ? "Cancel" : "Record New Payment"}
+        {showAddPaymentForm ? 'Cancel' : 'Record New Payment'}
       </button>
 
       {showAddPaymentForm && (
@@ -359,7 +359,7 @@ function PaymentsTab({
               id="payee"
               value={payeeUserId}
               onChange={(e) =>
-                setPayeeUserId(e.target.value as Id<"users"> | "")
+                setPayeeUserId(e.target.value as Id<'users'> | '')
               }
               className="input-field"
               disabled={isLoading || availablePayees.length === 0}
@@ -414,10 +414,10 @@ function PaymentsTab({
           </div>
           <button
             type="submit"
-            className={`btn btn-primary ${isLoading || !payeeUserId ? "btn-disabled" : ""}`}
+            className={`btn btn-primary ${isLoading || !payeeUserId ? 'btn-disabled' : ''}`}
             disabled={isLoading || !payeeUserId}
           >
-            {isLoading ? "Recording..." : "Record Payment"}
+            {isLoading ? 'Recording...' : 'Record Payment'}
           </button>
         </form>
       )}
@@ -457,38 +457,38 @@ function PaymentsTab({
         </ul>
       )}
     </div>
-  );
+  )
 }
 
 // --- Members Tab ---
 interface MembersTabProps {
-  groupId: Id<"groups">;
-  members: { userId: Id<"users">; name: string; email?: string | null }[];
+  groupId: Id<'groups'>
+  members: { userId: Id<'users'>; name: string; email?: string | null }[]
 }
 function MembersTab({ groupId, members }: MembersTabProps) {
-  const inviteUserMutation = useMutation(api.groups.inviteUserToGroup);
-  const [emailToInvite, setEmailToInvite] = useState("");
-  const [isInviting, setIsInviting] = useState(false);
+  const inviteUserMutation = useMutation(api.groups.inviteUserToGroup)
+  const [emailToInvite, setEmailToInvite] = useState('')
+  const [isInviting, setIsInviting] = useState(false)
 
   const handleInviteUser = async (e: FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!emailToInvite.trim()) {
-      toast.error("Email is required to invite a user.");
-      return;
+      toast.error('Email is required to invite a user.')
+      return
     }
-    setIsInviting(true);
+    setIsInviting(true)
     try {
-      await inviteUserMutation({ groupId, emailToInvite });
+      await inviteUserMutation({ groupId, emailToInvite })
       toast.success(
         `Invitation sent to ${emailToInvite} (if they are a registered user).`,
-      );
-      setEmailToInvite("");
+      )
+      setEmailToInvite('')
     } catch (error: any) {
-      toast.error(`Failed to invite user: ${error.message}`);
+      toast.error(`Failed to invite user: ${error.message}`)
     } finally {
-      setIsInviting(false);
+      setIsInviting(false)
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -515,10 +515,10 @@ function MembersTab({ groupId, members }: MembersTabProps) {
         </div>
         <button
           type="submit"
-          className={`btn btn-primary ${isInviting ? "btn-disabled" : ""}`}
+          className={`btn btn-primary ${isInviting ? 'btn-disabled' : ''}`}
           disabled={isInviting}
         >
-          {isInviting ? "Inviting..." : "Invite User"}
+          {isInviting ? 'Inviting...' : 'Invite User'}
         </button>
       </form>
 
@@ -549,16 +549,16 @@ function MembersTab({ groupId, members }: MembersTabProps) {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 // --- Balances Tab ---
 interface BalancesTabProps {
-  balances: GroupBalances;
+  balances: GroupBalances
 }
 function BalancesTab({ balances }: BalancesTabProps) {
   if (!balances) {
-    return <p className="text-on-surface-secondary">Loading balances...</p>;
+    return <p className="text-on-surface-secondary">Loading balances...</p>
   }
 
   return (
@@ -571,13 +571,13 @@ function BalancesTab({ balances }: BalancesTabProps) {
           {balances.members.map((member) => (
             <li
               key={member.userId}
-              className={`p-3 border rounded-md shadow-sm flex justify-between items-center ${member.balance >= -0.001 ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"}`}
+              className={`p-3 border rounded-md shadow-sm flex justify-between items-center ${member.balance >= -0.001 ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}
             >
               <span className="font-medium text-on-surface">{member.name}</span>
               <span
-                className={`font-semibold ${member.balance >= -0.001 ? "text-success" : "text-error"}`}
+                className={`font-semibold ${member.balance >= -0.001 ? 'text-success' : 'text-error'}`}
               >
-                {member.balance >= -0.001 ? "+" : ""}
+                {member.balance >= -0.001 ? '+' : ''}
                 {parseFloat(member.balance.toFixed(2))} {balances.currency}
               </span>
             </li>
@@ -604,8 +604,8 @@ function BalancesTab({ balances }: BalancesTabProps) {
               >
                 <span className="font-medium text-on-surface">
                   {r.fromName}
-                </span>{" "}
-                should pay{" "}
+                </span>{' '}
+                should pay{' '}
                 <span className="font-medium text-on-surface">{r.toName}</span>:
                 <span className="font-semibold ml-1 text-primary">
                   {parseFloat(r.amount.toFixed(2))} {balances.currency}
@@ -616,26 +616,26 @@ function BalancesTab({ balances }: BalancesTabProps) {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 // --- Settings Tab ---
 interface SettingsTabProps {
-  groupDetails: Doc<"groups"> & {
-    members: { userId: Id<"users">; name: string; email?: string | null }[];
-  };
+  groupDetails: Doc<'groups'> & {
+    members: { userId: Id<'users'>; name: string; email?: string | null }[]
+  }
 }
 
 function SettingsTab({ groupDetails }: SettingsTabProps) {
-  const updateSettingsMutation = useMutation(api.groups.updateGroupSettings);
-  const [name, setName] = useState(groupDetails.name);
-  const [currency, setCurrency] = useState(groupDetails.currency);
-  const [splitType, setSplitType] = useState<"EQUAL" | "PERCENTAGES">(
+  const updateSettingsMutation = useMutation(api.groups.updateGroupSettings)
+  const [name, setName] = useState(groupDetails.name)
+  const [currency, setCurrency] = useState(groupDetails.currency)
+  const [splitType, setSplitType] = useState<'EQUAL' | 'PERCENTAGES'>(
     groupDetails.defaultSplitRatio.type,
-  );
+  )
 
   const initialPercentages =
-    groupDetails.defaultSplitRatio.type === "PERCENTAGES" &&
+    groupDetails.defaultSplitRatio.type === 'PERCENTAGES' &&
     groupDetails.defaultSplitRatio.percentages
       ? groupDetails.defaultSplitRatio.percentages.map((p) => ({
           userId: p.userId,
@@ -644,18 +644,18 @@ function SettingsTab({ groupDetails }: SettingsTabProps) {
       : groupDetails.members.map((m) => ({
           userId: m.userId,
           share:
-            splitType === "EQUAL" && groupDetails.members.length > 0
+            splitType === 'EQUAL' && groupDetails.members.length > 0
               ? 100 / groupDetails.members.length
               : 0,
-        }));
+        }))
 
   const [percentages, setPercentages] =
-    useState<{ userId: Id<"users">; share: number }[]>(initialPercentages);
-  const [isLoading, setIsLoading] = useState(false);
+    useState<{ userId: Id<'users'>; share: number }[]>(initialPercentages)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handlePercentageChange = (userId: Id<"users">, value: string) => {
-    const newShare = parseFloat(value);
-    if (isNaN(newShare) && value !== "" && value !== "-") return;
+  const handlePercentageChange = (userId: Id<'users'>, value: string) => {
+    const newShare = parseFloat(value)
+    if (isNaN(newShare) && value !== '' && value !== '-') return
 
     setPercentages(
       (prev) =>
@@ -663,94 +663,91 @@ function SettingsTab({ groupDetails }: SettingsTabProps) {
           p.userId === userId
             ? {
                 ...p,
-                share: isNaN(newShare) ? (value === "-" ? 0 : 0) : newShare,
+                share: isNaN(newShare) ? (value === '-' ? 0 : 0) : newShare,
               }
             : p,
         ), // Allow typing '-', treat as 0 for now
-    );
-  };
+    )
+  }
 
   const rebalancePercentages = () => {
-    if (splitType !== "PERCENTAGES" || percentages.length === 0) return;
-    const totalMembers = percentages.length;
+    if (splitType !== 'PERCENTAGES' || percentages.length === 0) return
+    const totalMembers = percentages.length
     const equalShare =
-      totalMembers > 0 ? parseFloat((100 / totalMembers).toFixed(2)) : 0; // Ensure precision
+      totalMembers > 0 ? parseFloat((100 / totalMembers).toFixed(2)) : 0 // Ensure precision
 
     let updatedPercentages = percentages.map((p) => ({
       ...p,
       share: equalShare,
-    }));
+    }))
 
     // Adjust last member's share to ensure total is exactly 100 due to floating point issues
-    const currentTotal = updatedPercentages.reduce(
-      (sum, p) => sum + p.share,
-      0,
-    );
+    const currentTotal = updatedPercentages.reduce((sum, p) => sum + p.share, 0)
     if (totalMembers > 0 && Math.abs(currentTotal - 100) > 0.001) {
-      const difference = 100 - currentTotal;
-      updatedPercentages[totalMembers - 1].share += difference;
+      const difference = 100 - currentTotal
+      updatedPercentages[totalMembers - 1].share += difference
       updatedPercentages[totalMembers - 1].share = parseFloat(
         updatedPercentages[totalMembers - 1].share.toFixed(2),
-      );
+      )
     }
-    setPercentages(updatedPercentages);
-  };
+    setPercentages(updatedPercentages)
+  }
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!name.trim() || !currency.trim()) {
-      toast.error("Group name and currency are required.");
-      return;
+      toast.error('Group name and currency are required.')
+      return
     }
 
     let splitRatioPayload:
-      | { type: "EQUAL" }
+      | { type: 'EQUAL' }
       | {
-          type: "PERCENTAGES";
-          percentages: { userId: Id<"users">; share: number }[];
-        };
+          type: 'PERCENTAGES'
+          percentages: { userId: Id<'users'>; share: number }[]
+        }
 
-    if (splitType === "EQUAL") {
-      splitRatioPayload = { type: "EQUAL" };
+    if (splitType === 'EQUAL') {
+      splitRatioPayload = { type: 'EQUAL' }
     } else {
       const totalPercentage = percentages.reduce(
         (sum, p) => sum + (Number(p.share) || 0),
         0,
-      );
+      )
       if (Math.abs(totalPercentage - 100) > 0.1) {
         toast.error(
           `Total percentages must sum to 100%. Current sum: ${totalPercentage.toFixed(2)}%`,
-        );
-        return;
+        )
+        return
       }
       if (percentages.some((p) => (Number(p.share) || 0) < 0)) {
-        toast.error("Percentages cannot be negative.");
-        return;
+        toast.error('Percentages cannot be negative.')
+        return
       }
       splitRatioPayload = {
-        type: "PERCENTAGES",
+        type: 'PERCENTAGES',
         percentages: percentages.map((p) => ({
           userId: p.userId,
           share: (Number(p.share) || 0) / 100,
         })),
-      };
+      }
     }
 
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       await updateSettingsMutation({
         groupId: groupDetails._id,
         name,
         currency,
         defaultSplitRatio: splitRatioPayload,
-      });
-      toast.success("Group settings updated!");
+      })
+      toast.success('Group settings updated!')
     } catch (error: any) {
-      toast.error(`Failed to update settings: ${error.message}`);
+      toast.error(`Failed to update settings: ${error.message}`)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} className="card space-y-6">
@@ -799,8 +796,8 @@ function SettingsTab({ groupDetails }: SettingsTabProps) {
               type="radio"
               name="splitType"
               value="EQUAL"
-              checked={splitType === "EQUAL"}
-              onChange={() => setSplitType("EQUAL")}
+              checked={splitType === 'EQUAL'}
+              onChange={() => setSplitType('EQUAL')}
               className="form-radio text-primary focus:ring-primary"
               disabled={isLoading}
             />
@@ -811,8 +808,8 @@ function SettingsTab({ groupDetails }: SettingsTabProps) {
               type="radio"
               name="splitType"
               value="PERCENTAGES"
-              checked={splitType === "PERCENTAGES"}
-              onChange={() => setSplitType("PERCENTAGES")}
+              checked={splitType === 'PERCENTAGES'}
+              onChange={() => setSplitType('PERCENTAGES')}
               className="form-radio text-primary focus:ring-primary"
               disabled={isLoading}
             />
@@ -821,7 +818,7 @@ function SettingsTab({ groupDetails }: SettingsTabProps) {
         </div>
       </div>
 
-      {splitType === "PERCENTAGES" && (
+      {splitType === 'PERCENTAGES' && (
         <div className="space-y-3 p-3 border border-light rounded-md bg-background">
           <div className="flex justify-between items-center">
             <h4 className="text-md font-medium text-on-surface">
@@ -839,7 +836,7 @@ function SettingsTab({ groupDetails }: SettingsTabProps) {
           {percentages.map((p) => {
             const member = groupDetails.members.find(
               (m) => m.userId === p.userId,
-            );
+            )
             return (
               <div key={p.userId} className="flex items-center space-x-2">
                 <label
@@ -865,10 +862,10 @@ function SettingsTab({ groupDetails }: SettingsTabProps) {
                 />
                 <span className="text-sm text-on-surface-secondary">%</span>
               </div>
-            );
+            )
           })}
           <p className="text-sm font-medium text-on-surface">
-            Total:{" "}
+            Total:{' '}
             {percentages
               .reduce((sum, p) => sum + (Number(p.share) || 0), 0)
               .toFixed(2)}
@@ -879,11 +876,11 @@ function SettingsTab({ groupDetails }: SettingsTabProps) {
 
       <button
         type="submit"
-        className={`btn btn-primary ${isLoading ? "btn-disabled" : ""}`}
+        className={`btn btn-primary ${isLoading ? 'btn-disabled' : ''}`}
         disabled={isLoading}
       >
-        {isLoading ? "Saving..." : "Save Settings"}
+        {isLoading ? 'Saving...' : 'Save Settings'}
       </button>
     </form>
-  );
+  )
 }

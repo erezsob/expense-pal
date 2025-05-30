@@ -1,18 +1,18 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
-import { api } from "../../convex/_generated/api";
-import { useQuery } from "convex/react";
-import { Home } from "@/Home";
+import { createFileRoute, Navigate } from '@tanstack/react-router'
+import { api } from '../../convex/_generated/api'
+import { useQuery } from 'convex/react'
+import { Home } from '@/Home'
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute('/')({
   component: Index,
-});
+})
 
 export function Index() {
-  const loggedInUser = useQuery(api.auth.loggedInUser);
+  const loggedInUser = useQuery(api.auth.loggedInUser)
 
   if (!loggedInUser) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" />
   }
 
-  return <Home />;
+  return <Home />
 }

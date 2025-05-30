@@ -1,13 +1,13 @@
-import { useAuthActions } from "@convex-dev/auth/react";
-import { Link } from "@tanstack/react-router";
-import { useConvexAuth } from "convex/react";
+import { useAuthActions } from '@convex-dev/auth/react'
+import { Link } from '@tanstack/react-router'
+import { useConvexAuth } from 'convex/react'
 
 export function SignOutButton() {
-  const { isAuthenticated } = useConvexAuth();
-  const { signOut } = useAuthActions();
+  const { isAuthenticated } = useConvexAuth()
+  const { signOut } = useAuthActions()
 
   if (!isAuthenticated) {
-    return null;
+    return null
   }
 
   return (
@@ -18,5 +18,5 @@ export function SignOutButton() {
     >
       Sign out
     </Link>
-  );
+  )
 }

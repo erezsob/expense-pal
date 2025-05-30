@@ -1,17 +1,17 @@
-import { SignInForm } from "@/SignInForm";
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { SignInForm } from '@/SignInForm'
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute('/login')({
   component: Login,
-});
+})
 
 export function Login() {
-  const loggedInUser = useQuery(api.auth.loggedInUser);
+  const loggedInUser = useQuery(api.auth.loggedInUser)
 
   if (loggedInUser) {
-    return <Navigate to="/" />;
+    return <Navigate to="/" />
   }
 
   return (
@@ -28,5 +28,5 @@ export function Login() {
         <SignInForm />
       </div>
     </div>
-  );
+  )
 }

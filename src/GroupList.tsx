@@ -1,20 +1,20 @@
-import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+import { useQuery } from 'convex/react'
+import { api } from '../convex/_generated/api'
+import { Id } from '../convex/_generated/dataModel'
 
 interface GroupListProps {
-  onSelectGroup: (groupId: Id<"groups">) => void;
+  onSelectGroup: (groupId: Id<'groups'>) => void
 }
 
 export function GroupList({ onSelectGroup }: GroupListProps) {
-  const groups = useQuery(api.groups.getGroupsForUser);
+  const groups = useQuery(api.groups.getGroupsForUser)
 
   if (groups === undefined) {
     return (
       <div className="text-center py-4 text-on-surface-secondary">
         Loading groups...
       </div>
-    );
+    )
   }
 
   if (groups.length === 0) {
@@ -22,7 +22,7 @@ export function GroupList({ onSelectGroup }: GroupListProps) {
       <p className="text-on-surface-secondary text-center py-4">
         You are not part of any groups yet. Create one above!
       </p>
-    );
+    )
   }
 
   return (
@@ -41,10 +41,10 @@ export function GroupList({ onSelectGroup }: GroupListProps) {
               Currency: {group!.currency}
             </p>
           </div>
-          <span className="text-lg text-primary">&#x276F;</span>{" "}
+          <span className="text-lg text-primary">&#x276F;</span>{' '}
           {/* Right arrow */}
         </li>
       ))}
     </ul>
-  );
+  )
 }
