@@ -10,6 +10,10 @@ export const Route = createFileRoute('/')({
 export function Index() {
   const loggedInUser = useQuery(api.auth.loggedInUser)
 
+  if (loggedInUser === undefined) {
+    return <div>Loading...</div>
+  }
+
   if (!loggedInUser) {
     return <Navigate to="/login" />
   }
