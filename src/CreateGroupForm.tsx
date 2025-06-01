@@ -3,6 +3,8 @@ import { FormEvent, useState } from 'react'
 import { api } from '../convex/_generated/api'
 import { toast } from 'sonner'
 import { Id } from '../convex/_generated/dataModel'
+import { Input } from './components/ui/input'
+import { Button } from './components/ui/button'
 
 interface CreateGroupFormProps {
   onSuccess: (groupId: Id<'groups'>) => void
@@ -39,13 +41,10 @@ export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label
-          htmlFor="groupName"
-          className="block text-sm font-medium text-on-surface-secondary mb-1"
-        >
+        <label htmlFor="groupName" className="mb-1 block text-sm font-medium">
           Group Name
         </label>
-        <input
+        <Input
           type="text"
           id="groupName"
           value={name}
@@ -56,13 +55,10 @@ export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
         />
       </div>
       <div>
-        <label
-          htmlFor="currency"
-          className="block text-sm font-medium text-on-surface-secondary mb-1"
-        >
+        <label htmlFor="currency" className="mb-1 block text-sm font-medium">
           Currency
         </label>
-        <input
+        <Input
           type="text"
           id="currency"
           value={currency}
@@ -73,13 +69,14 @@ export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
           disabled={isLoading}
         />
       </div>
-      <button
+      <Button
         type="submit"
-        className={`btn btn-primary w-full ${isLoading ? 'btn-disabled' : ''}`}
         disabled={isLoading || !name.trim() || !currency.trim()}
+        variant="default"
+        className="w-full"
       >
         {isLoading ? 'Creating...' : 'Create Group'}
-      </button>
+      </Button>
     </form>
   )
 }

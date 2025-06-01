@@ -15,16 +15,16 @@ export function Login() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-8 mt-12 text-center">
+    <div className="mt-12 flex flex-col items-center gap-8 text-center">
       <div>
-        <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-3">
+        <h1 className="text-primary mb-3 text-3xl font-bold sm:text-4xl">
           Welcome to SplitEase
         </h1>
-        <p className="text-lg sm:text-xl text-on-surface-secondary">
+        <p className="text-lg sm:text-xl">
           Sign in to manage your shared expenses effortlessly.
         </p>
       </div>
-      <div className="w-full max-w-sm card">
+      <div className="card w-full max-w-sm">
         <SignInForm />
       </div>
     </div>
