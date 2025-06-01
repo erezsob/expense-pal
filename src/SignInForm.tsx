@@ -2,6 +2,7 @@ import { useAuthActions } from '@convex-dev/auth/react'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from './components/ui/button'
 
 export function SignInForm() {
   const navigate = useNavigate()
@@ -47,22 +48,22 @@ export function SignInForm() {
           placeholder="Password"
           required
         />
-        <button className="auth-button" type="submit" disabled={submitting}>
+        <Button className="auth-button" type="submit" disabled={submitting}>
           {flow === 'signIn' ? 'Sign in' : 'Sign up'}
-        </button>
+        </Button>
         <div className="text-center text-sm text-secondary">
           <span>
             {flow === 'signIn'
               ? "Don't have an account? "
               : 'Already have an account? '}
           </span>
-          <button
+          <Button
             type="button"
             className="text-primary hover:text-primary-hover hover:underline font-medium cursor-pointer"
             onClick={() => setFlow(flow === 'signIn' ? 'signUp' : 'signIn')}
           >
             {flow === 'signIn' ? 'Sign up instead' : 'Sign in instead'}
-          </button>
+          </Button>
         </div>
       </form>
       <div className="flex items-center justify-center my-3">
@@ -70,7 +71,7 @@ export function SignInForm() {
         <span className="mx-4 text-secondary">or</span>
         <hr className="my-4 grow border-gray-200" />
       </div>
-      <button
+      <Button
         className="auth-button"
         onClick={() => {
           signIn('anonymous')
@@ -78,7 +79,7 @@ export function SignInForm() {
         }}
       >
         Sign in anonymously
-      </button>
+      </Button>
     </div>
   )
 }
