@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
@@ -13,25 +12,29 @@ import { MembersTab } from '../MembersTab'
 import { BalancesTab } from '../BalancesTab'
 import { SettingsTab } from '../SettingsTab'
 import { Spinner } from '@/components/ui/spinner'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export const Route = createFileRoute('/groups/$groupId')({
   component: GroupView,
 })
 
-interface GroupViewProps {
-  groupId: Id<'groups'>
-}
+const tabs = [
+  'expenses',
+  'payments',
+  'members',
+  'balances',
+  'settings',
+] as const
 
-export function GroupView({ groupId }: GroupViewProps) {
+export function GroupView() {
+  const { groupId: groupIdString } = Route.useParams()
+  const groupId = groupIdString as Id<'groups'>
+  console.log('TCL: ~ GroupView ~ groupId:', groupId)
   const groupDetails = useQuery(api.groups.getGroupDetails, { groupId })
   const expenses = useQuery(api.expenses.getExpensesForGroup, { groupId })
   const payments = useQuery(api.payments.getPaymentsForGroup, { groupId })
   const balances = useQuery(api.balances.getGroupBalances, { groupId })
   const loggedInUser = useQuery(api.auth.loggedInUser)
-
-  const [activeTab, setActiveTab] = useState<
-    'expenses' | 'payments' | 'members' | 'balances' | 'settings'
-  >('expenses')
 
   const navigate = useNavigate()
   const handleBackClick = () => navigate({ to: '/' })
@@ -74,31 +77,23 @@ export function GroupView({ groupId }: GroupViewProps) {
         <p className="">Currency: {groupDetails.currency}</p>
       </header>
 
-      <div className="border-light flex border-b">
-        {(
-          ['expenses', 'payments', 'members', 'balances', 'settings'] as const
-        ).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`tab-button capitalize ${
-              activeTab === tab ? 'tab-button-active' : 'tab-button-inactive'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
+      <Tabs defaultValue="expenses">
+        <TabsList>
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab} value={tab}>
+              {tab}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      <div className="mt-6">
-        {activeTab === 'expenses' && expenses && (
+        <TabsContent value="expenses">
           <ExpensesTab
             groupId={groupId}
             expenses={expenses}
             currency={groupDetails.currency}
           />
-        )}
-        {activeTab === 'payments' && payments && (
+        </TabsContent>
+        <TabsContent value="payments">
           <PaymentsTab
             groupId={groupId}
             payments={payments}
@@ -108,23 +103,19 @@ export function GroupView({ groupId }: GroupViewProps) {
             currency={groupDetails.currency}
             loggedInUserId={loggedInUser._id}
           />
-        )}
-        {activeTab === 'members' && (
+        </TabsContent>
+        <TabsContent value="members">
           <MembersTab
             groupId={groupId}
             members={
-              groupDetails.members as {
-                userId: Id<'users'>
-                name: string
-                email?: string | null
-              }[]
+              groupDetails.members as { userId: Id<'users'>; name: string }[]
             }
           />
-        )}
-        {activeTab === 'balances' && balances && (
+        </TabsContent>
+        <TabsContent value="balances">
           <BalancesTab balances={balances} />
-        )}
-        {activeTab === 'settings' && (
+        </TabsContent>
+        <TabsContent value="settings">
           <SettingsTab
             groupDetails={
               groupDetails as Doc<'groups'> & {
@@ -136,8 +127,8 @@ export function GroupView({ groupId }: GroupViewProps) {
               }
             }
           />
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
