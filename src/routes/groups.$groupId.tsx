@@ -18,7 +18,7 @@ export const Route = createFileRoute('/groups/$groupId')({
   component: GroupView,
 })
 
-const tabs = [
+const TABS = [
   'expenses',
   'payments',
   'members',
@@ -79,7 +79,7 @@ export function GroupView() {
 
       <Tabs defaultValue="expenses">
         <TabsList>
-          {tabs.map((tab) => (
+          {TABS.map((tab) => (
             <TabsTrigger key={tab} value={tab}>
               {tab}
             </TabsTrigger>
