@@ -8,8 +8,8 @@
     "dev:frontend": "vite --open",
     "dev:backend": "convex dev",
     "lint": "tsc -p convex -noEmit --pretty false && tsc -p . -noEmit --pretty false && convex dev --once && vite build",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "prettier --write ./src",
+    "format:check": "prettier --check ./src",
     "types:check": "tsc -p convex -noEmit --pretty false && tsc -p . -noEmit --pretty false",
     "lint:check": "eslint .",
     "lint:fix": "eslint --fix ."
