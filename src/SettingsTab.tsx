@@ -7,6 +7,9 @@ import { Id } from '../convex/_generated/dataModel'
 import { Doc } from '../convex/_generated/dataModel'
 import { api } from '../convex/_generated/api'
 
+import { Text } from './components/ui/text'
+import { Button } from './components/ui/button'
+
 interface SettingsTabProps {
   groupDetails: Doc<'groups'> & {
     members: { userId: Id<'users'>; name: string; email?: string | null }[]
@@ -137,44 +140,39 @@ export function SettingsTab({ groupDetails }: SettingsTabProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card space-y-6">
-      <h3 className="text-xl font-semibold">Group Settings</h3>
+    <form onSubmit={handleSubmit} className="mx-auto w-full max-w-lg space-y-6">
       <div>
-        <label
-          htmlFor="groupNameSet"
-          className="mb-1 block text-sm font-medium"
-        >
-          Group Name
-        </label>
+        <Text className="mb-1 text-2xl font-bold">Group Settings</Text>
+        <Text variant="muted" className="mb-4 text-sm">
+          Update your group details and default split ratio.
+        </Text>
+      </div>
+      <div className="space-y-2">
+        <Text className="font-medium">Group Name</Text>
         <input
           id="groupNameSet"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="input-field"
+          className="input-field w-full"
           disabled={isLoading}
         />
       </div>
-      <div>
-        <label htmlFor="currencySet" className="mb-1 block text-sm font-medium">
-          Currency
-        </label>
+      <div className="space-y-2">
+        <Text className="font-medium">Currency</Text>
         <input
           id="currencySet"
           type="text"
           value={currency}
           onChange={(e) => setCurrency(e.target.value.toUpperCase())}
           maxLength={3}
-          className="input-field"
+          className="input-field w-full"
           disabled={isLoading}
         />
       </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium">
-          Default Expense Split Ratio
-        </label>
-        <div className="mt-1 flex space-x-4">
+      <div className="space-y-2">
+        <Text className="font-medium">Default Expense Split Ratio</Text>
+        <div className="flex gap-6">
           <label className="flex cursor-pointer items-center">
             <input
               type="radio"
@@ -201,70 +199,43 @@ export function SettingsTab({ groupDetails }: SettingsTabProps) {
           </label>
         </div>
       </div>
-
       {splitType === 'PERCENTAGES' && (
-        <div className="border-light bg-background space-y-3 rounded-md border p-3">
-          <div className="flex items-center justify-between">
-            <h4 className="text-md font-medium">
-              Define Percentages (must sum to 100%)
-            </h4>
-            <button
-              type="button"
-              onClick={rebalancePercentages}
-              className="btn btn-secondary px-2 py-1 text-xs"
-              disabled={isLoading || groupDetails.members.length === 0}
-            >
-              Distribute Equally
-            </button>
-          </div>
-          {percentages.map((p) => {
-            const member = groupDetails.members.find(
-              (m) => m.userId === p.userId,
-            )
-            return (
-              <div key={p.userId} className="flex items-center space-x-2">
-                <label
-                  htmlFor={`percentage-${p.userId}`}
-                  className="w-1/2 truncate text-sm"
-                  title={member?.name ?? p.userId}
-                >
-                  {member?.name ?? p.userId}
-                </label>
+        <div className="space-y-2">
+          <Text className="font-medium">Set Percentages</Text>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {percentages.map((p, idx) => (
+              <div key={p.userId} className="flex items-center gap-2">
+                <Text className="w-24 truncate">
+                  {groupDetails.members.find((m) => m.userId === p.userId)
+                    ?.name || 'Member'}
+                </Text>
                 <input
-                  id={`percentage-${p.userId}`}
                   type="number"
-                  value={p.share} // Keep as string for input control if needed, or manage as number
+                  min={0}
+                  max={100}
+                  value={p.share}
                   onChange={(e) =>
                     handlePercentageChange(p.userId, e.target.value)
                   }
-                  className="input-field w-1/2 p-1 text-sm"
-                  step="0.01"
-                  min="0"
-                  max="100"
-                  placeholder="e.g. 50"
+                  className="input-field w-20"
                   disabled={isLoading}
                 />
-                <span className="text-sm">%</span>
+                <span className="text-muted-foreground">%</span>
               </div>
-            )
-          })}
-          <p className="text-sm font-medium">
+            ))}
+          </div>
+          <Text variant="muted" className="mt-1 text-xs">
             Total:{' '}
             {percentages
               .reduce((sum, p) => sum + (Number(p.share) || 0), 0)
               .toFixed(2)}
             %
-          </p>
+          </Text>
         </div>
       )}
-
-      <button
-        type="submit"
-        className={`btn btn-primary ${isLoading ? 'btn-disabled' : ''}`}
-        disabled={isLoading}
-      >
+      <Button type="submit" disabled={isLoading} className="w-full">
         {isLoading ? 'Saving...' : 'Save Settings'}
-      </button>
+      </Button>
     </form>
   )
 }

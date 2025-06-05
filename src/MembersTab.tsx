@@ -6,6 +6,8 @@ import { useMutation } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import { useState } from 'react'
 import { Button } from './components/ui/button'
+import { Text } from './components/ui/text'
+import { Input } from './components/ui/input'
 
 interface MembersTabProps {
   groupId: Id<'groups'>
@@ -39,26 +41,29 @@ export function MembersTab({ groupId, members }: MembersTabProps) {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleInviteUser} className="card space-y-3">
-        <h3 className="text-lg font-medium">Invite New Member</h3>
+      <form
+        onSubmit={handleInviteUser}
+        className="mx-auto w-full max-w-md space-y-4"
+      >
         <div>
-          <label
-            htmlFor="inviteEmail"
-            className="mb-1 block text-sm font-medium"
-          >
-            User's Email
-          </label>
-          <input
+          <Text className="mb-1 text-lg font-semibold">Invite New Member</Text>
+          <Text variant="muted" className="mb-2 text-sm">
+            Invite a new member to your group by email.
+          </Text>
+        </div>
+        <div className="space-y-2">
+          <Text className="font-medium">User's Email</Text>
+          <Input
             id="inviteEmail"
             type="email"
             value={emailToInvite}
             onChange={(e) => setEmailToInvite(e.target.value)}
             placeholder="user@example.com"
-            className="input-field"
             disabled={isInviting}
+            className="w-full"
           />
         </div>
-        <Button type="submit" disabled={isInviting}>
+        <Button type="submit" disabled={isInviting} className="w-full">
           {isInviting ? 'Inviting...' : 'Invite User'}
         </Button>
       </form>

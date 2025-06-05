@@ -6,6 +6,8 @@ import { api } from '../convex/_generated/api'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from './components/ui/button'
+import { Text } from './components/ui/text'
+import { Input } from './components/ui/input'
 
 interface PaymentsTabProps {
   groupId: Id<'groups'>
@@ -67,21 +69,25 @@ export function PaymentsTab({
       </Button>
 
       {showAddPaymentForm && (
-        <form onSubmit={handleRecordPayment} className="card space-y-3">
-          <h3 className="text-lg font-medium">
-            Record Payment (I paid someone)
-          </h3>
+        <form
+          onSubmit={handleRecordPayment}
+          className="mx-auto w-full max-w-md space-y-5"
+        >
           <div>
-            <label htmlFor="payee" className="mb-1 block text-sm font-medium">
-              To (Payee)
-            </label>
+            <Text className="mb-1 text-lg font-semibold">Record Payment</Text>
+            <Text variant="muted" className="mb-2 text-sm">
+              Log a payment you made to another group member.
+            </Text>
+          </div>
+          <div className="space-y-2">
+            <Text className="font-medium">To (Payee)</Text>
             <select
               id="payee"
               value={payeeUserId}
               onChange={(e) =>
                 setPayeeUserId(e.target.value as Id<'users'> | '')
               }
-              className="input-field"
+              className="input-field w-full"
               disabled={isLoading || availablePayees.length === 0}
             >
               <option value="">Select Member</option>
@@ -92,53 +98,43 @@ export function PaymentsTab({
               ))}
             </select>
             {availablePayees.length === 0 && (
-              <p className="text-error mt-1 text-xs">
+              <Text variant="muted" className="text-error mt-1 text-xs">
                 No other members to pay.
-              </p>
+              </Text>
             )}
           </div>
-          <div>
-            <label
-              htmlFor="paymentAmount"
-              className="mb-1 block text-sm font-medium"
-            >
-              Amount ({currency})
-            </label>
-            <input
+          <div className="space-y-2">
+            <Text className="font-medium">Amount ({currency})</Text>
+            <Input
               id="paymentAmount"
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="e.g., 20.00"
-              className="input-field"
               step="0.01"
               disabled={isLoading}
+              className="w-full"
             />
           </div>
-          <div>
-            <label
-              htmlFor="paymentNotes"
-              className="mb-1 block text-sm font-medium"
-            >
-              Notes (Optional)
-            </label>
-            <input
+          <div className="space-y-2">
+            <Text className="font-medium">Notes (Optional)</Text>
+            <Input
               id="paymentNotes"
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g., For lunch"
-              className="input-field"
               disabled={isLoading}
+              className="w-full"
             />
           </div>
-          <button
+          <Button
             type="submit"
-            className={`btn btn-primary ${isLoading || !payeeUserId ? 'btn-disabled' : ''}`}
             disabled={isLoading || !payeeUserId}
+            className="w-full"
           >
             {isLoading ? 'Recording...' : 'Record Payment'}
-          </button>
+          </Button>
         </form>
       )}
 

@@ -7,6 +7,7 @@ import { Input } from './components/ui/input'
 import { Button } from './components/ui/button'
 import { Text } from './components/ui/text'
 import { Spacer } from './components/ui/spacer'
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
 
 interface CreateGroupFormProps {
   onSuccess: (groupId: Id<'groups'>) => void
@@ -41,7 +42,7 @@ export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md space-y-6">
       <div className="space-y-2">
         <Text className="font-medium">Group Name</Text>
         <Input
