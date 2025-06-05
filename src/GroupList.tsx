@@ -1,6 +1,8 @@
 import { useQuery } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import { Id } from '../convex/_generated/dataModel'
+import { Text } from './components/ui/text'
+import { Spacer } from './components/ui/spacer'
 
 interface GroupListProps {
   onSelectGroup: (groupId: Id<'groups'>) => void
@@ -10,35 +12,47 @@ export function GroupList({ onSelectGroup }: GroupListProps) {
   const groups = useQuery(api.groups.getGroupsForUser)
 
   if (groups === undefined) {
-    return <div className="py-4 text-center">Loading groups...</div>
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Text variant="muted">Loading groups...</Text>
+      </div>
+    )
   }
 
   if (groups.length === 0) {
     return (
-      <p className="py-4 text-center">
-        You are not part of any groups yet. Create one above!
-      </p>
+      <div className="flex items-center justify-center py-8">
+        <Text variant="muted">
+          You are not part of any groups yet. Create one above!
+        </Text>
+      </div>
     )
   }
 
   return (
-    <ul className="space-y-3">
+    <div className="grid gap-3">
       {groups.map((group) => (
-        <li
+        <button
           key={group!._id}
-          className="bg-background border-light flex cursor-pointer items-center justify-between rounded-md border p-4 transition-shadow hover:shadow-lg"
           onClick={() => onSelectGroup(group!._id)}
+          className="group bg-card hover:bg-accent hover:text-accent-foreground flex w-full items-center justify-between rounded-lg border p-4 text-left transition-all"
         >
           <div>
-            <h3 className="text-primary text-lg font-semibold">
-              {group!.name}
-            </h3>
-            <p className="text-sm">Currency: {group!.currency}</p>
+            <Text className="font-semibold">{group!.name}</Text>
+            <Text variant="muted" className="text-sm">
+              Currency: {group!.currency}
+            </Text>
           </div>
-          <span className="text-primary text-lg">&#x276F;</span>{' '}
-          {/* Right arrow */}
-        </li>
+          <div className="flex items-center gap-2">
+            <Text variant="muted" className="text-sm">
+              View details
+            </Text>
+            <span className="text-muted-foreground transition-transform group-hover:translate-x-1">
+              →
+            </span>
+          </div>
+        </button>
       ))}
-    </ul>
+    </div>
   )
 }

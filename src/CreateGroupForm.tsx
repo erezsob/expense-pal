@@ -5,6 +5,8 @@ import { toast } from 'sonner'
 import { Id } from '../convex/_generated/dataModel'
 import { Input } from './components/ui/input'
 import { Button } from './components/ui/button'
+import { Text } from './components/ui/text'
+import { Spacer } from './components/ui/spacer'
 
 interface CreateGroupFormProps {
   onSuccess: (groupId: Id<'groups'>) => void
@@ -39,40 +41,35 @@ export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="groupName" className="mb-1 block text-sm font-medium">
-          Group Name
-        </label>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <Text className="font-medium">Group Name</Text>
         <Input
           type="text"
           id="groupName"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="input-field"
           placeholder="e.g., Trip to Bali"
           disabled={isLoading}
+          className="w-full"
         />
       </div>
-      <div>
-        <label htmlFor="currency" className="mb-1 block text-sm font-medium">
-          Currency
-        </label>
+      <div className="space-y-2">
+        <Text className="font-medium">Currency</Text>
         <Input
           type="text"
           id="currency"
           value={currency}
           onChange={(e) => setCurrency(e.target.value.toUpperCase())}
-          className="input-field"
           placeholder="e.g., USD, EUR, JPY"
           maxLength={3}
           disabled={isLoading}
+          className="w-full"
         />
       </div>
       <Button
         type="submit"
         disabled={isLoading || !name.trim() || !currency.trim()}
-        variant="default"
         className="w-full"
       >
         {isLoading ? 'Creating...' : 'Create Group'}
