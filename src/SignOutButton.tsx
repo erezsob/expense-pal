@@ -13,7 +13,7 @@ export function SignOutButton() {
   return (
     <Link
       to="/login"
-      className="text-secondary hover:text-secondary-hover rounded-sm border border-gray-200 bg-white px-4 py-2 font-semibold shadow-sm transition-colors hover:bg-gray-50 hover:shadow"
+      className="text-primary dark:text-secondary rounded-sm border border-gray-200 bg-white px-4 py-2 font-semibold shadow-sm transition-colors hover:bg-gray-50 hover:shadow"
       onClick={() => void signOut()}
     >
       Sign out
