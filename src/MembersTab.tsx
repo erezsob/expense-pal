@@ -5,6 +5,7 @@ import { Id } from '../convex/_generated/dataModel'
 import { useMutation } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import { useState } from 'react'
+import { Button } from './components/ui/button'
 
 interface MembersTabProps {
   groupId: Id<'groups'>
@@ -57,13 +58,9 @@ export function MembersTab({ groupId, members }: MembersTabProps) {
             disabled={isInviting}
           />
         </div>
-        <button
-          type="submit"
-          className={`btn btn-primary ${isInviting ? 'btn-disabled' : ''}`}
-          disabled={isInviting}
-        >
+        <Button type="submit" disabled={isInviting}>
           {isInviting ? 'Inviting...' : 'Invite User'}
-        </button>
+        </Button>
       </form>
 
       <div>

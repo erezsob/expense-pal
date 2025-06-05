@@ -5,6 +5,7 @@ import { EnrichedPayment } from '../convex/payments'
 import { api } from '../convex/_generated/api'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from './components/ui/button'
 
 interface PaymentsTabProps {
   groupId: Id<'groups'>
@@ -58,12 +59,12 @@ export function PaymentsTab({
 
   return (
     <div className="space-y-4">
-      <button
+      <Button
         onClick={() => setShowAddPaymentForm(!showAddPaymentForm)}
-        className={`btn ${showAddPaymentForm ? 'btn-secondary' : 'bg-accent text-accent-contrast hover:bg-accent-dark focus:ring-accent'}`}
+        variant={showAddPaymentForm ? 'secondary' : 'default'}
       >
         {showAddPaymentForm ? 'Cancel' : 'Record New Payment'}
-      </button>
+      </Button>
 
       {showAddPaymentForm && (
         <form onSubmit={handleRecordPayment} className="card space-y-3">

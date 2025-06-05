@@ -13,23 +13,18 @@ import { BalancesTab } from '../BalancesTab'
 import { SettingsTab } from '../SettingsTab'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Text } from '@/components/ui/text'
 
 export const Route = createFileRoute('/groups/$groupId')({
   component: GroupView,
 })
 
-const TABS = [
-  'expenses',
-  'payments',
-  'members',
-  'balances',
-  'settings',
-] as const
+const TABS = ['expenses', 'members', 'balances', 'settings'] as const
 
 export function GroupView() {
   const { groupId: groupIdString } = Route.useParams()
   const groupId = groupIdString as Id<'groups'>
-  console.log('TCL: ~ GroupView ~ groupId:', groupId)
   const groupDetails = useQuery(api.groups.getGroupDetails, { groupId })
   const expenses = useQuery(api.expenses.getExpensesForGroup, { groupId })
   const payments = useQuery(api.payments.getPaymentsForGroup, { groupId })
@@ -66,11 +61,11 @@ export function GroupView() {
   }
 
   return (
-    <div className="space-y-6">
-      <button onClick={handleBackClick} className="btn btn-ghost mb-2 text-sm">
+    <div className="flex flex-col items-start gap-6">
+      <Button onClick={handleBackClick} variant="link" className="p-0">
         &larr; Back to Groups
-      </button>
-      <header className="border-light border-b pb-4">
+      </Button>
+      <header>
         <h1 className="text-primary text-2xl font-bold sm:text-3xl">
           {groupDetails.name}
         </h1>
@@ -81,7 +76,7 @@ export function GroupView() {
         <TabsList>
           {TABS.map((tab) => (
             <TabsTrigger key={tab} value={tab}>
-              {tab}
+              <Text className="capitalize">{tab}</Text>
             </TabsTrigger>
           ))}
         </TabsList>
@@ -91,17 +86,6 @@ export function GroupView() {
             groupId={groupId}
             expenses={expenses}
             currency={groupDetails.currency}
-          />
-        </TabsContent>
-        <TabsContent value="payments">
-          <PaymentsTab
-            groupId={groupId}
-            payments={payments}
-            members={
-              groupDetails.members as { userId: Id<'users'>; name: string }[]
-            }
-            currency={groupDetails.currency}
-            loggedInUserId={loggedInUser._id}
           />
         </TabsContent>
         <TabsContent value="members">
