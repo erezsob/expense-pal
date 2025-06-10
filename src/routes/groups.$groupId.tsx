@@ -2,12 +2,11 @@ import { toast } from 'sonner'
 
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Id } from '../../convex/_generated/dataModel'
-import { useQuery } from 'convex/react'
+import { convexQuery } from '@convex-dev/react-query'
 import { api } from '../../convex/_generated/api'
 import { Doc } from '../../convex/_generated/dataModel'
 
 import { ExpensesTab } from '../ExpensesTab'
-import { PaymentsTab } from '../PaymentsTab'
 import { MembersTab } from '../MembersTab'
 import { BalancesTab } from '../BalancesTab'
 import { SettingsTab } from '../SettingsTab'
@@ -16,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Text } from '@/components/ui/text'
 import { Card, CardContent } from '@/components/ui/card'
+import { useQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/groups/$groupId')({
   component: GroupView,
@@ -26,21 +26,29 @@ const TABS = ['expenses', 'members', 'balances', 'settings'] as const
 export function GroupView() {
   const { groupId: groupIdString } = Route.useParams()
   const groupId = groupIdString as Id<'groups'>
-  const groupDetails = useQuery(api.groups.getGroupDetails, { groupId })
-  const expenses = useQuery(api.expenses.getExpensesForGroup, { groupId })
-  const payments = useQuery(api.payments.getPaymentsForGroup, { groupId })
-  const balances = useQuery(api.balances.getGroupBalances, { groupId })
-  const loggedInUser = useQuery(api.auth.loggedInUser)
+
+  const { data: groupDetails, isLoading: isGroupDetailsLoading } = useQuery(
+    convexQuery(api.groups.getGroupDetails, { groupId }),
+  )
+
+  const { data: expenses, isLoading: isExpensesLoading } = useQuery(
+    convexQuery(api.expenses.getExpensesForGroup, { groupId }),
+  )
+  const { data: balances, isLoading: isBalancesLoading } = useQuery(
+    convexQuery(api.balances.getGroupBalances, { groupId }),
+  )
+  const { data: loggedInUser, isLoading: isLoggedInUserLoading } = useQuery(
+    convexQuery(api.auth.loggedInUser, {}),
+  )
 
   const navigate = useNavigate()
   const handleBackClick = () => navigate({ to: '/' })
 
   if (
-    groupDetails === undefined ||
-    expenses === undefined ||
-    payments === undefined ||
-    balances === undefined ||
-    loggedInUser === undefined
+    isGroupDetailsLoading ||
+    isExpensesLoading ||
+    isBalancesLoading ||
+    isLoggedInUserLoading
   ) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -96,7 +104,7 @@ export function GroupView() {
             <TabsContent value="expenses">
               <ExpensesTab
                 groupId={groupId}
-                expenses={expenses}
+                expenses={expenses || []}
                 currency={groupDetails.currency}
               />
             </TabsContent>

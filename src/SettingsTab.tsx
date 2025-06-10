@@ -1,7 +1,6 @@
 import { toast } from 'sonner'
 import { FormEvent, useState } from 'react'
 
-import { useMutation } from 'convex/react'
 import { Id } from '../convex/_generated/dataModel'
 
 import { Doc } from '../convex/_generated/dataModel'
@@ -9,6 +8,8 @@ import { api } from '../convex/_generated/api'
 
 import { Text } from './components/ui/text'
 import { Button } from './components/ui/button'
+import { useConvexMutation } from '@convex-dev/react-query'
+import { useMutation } from '@tanstack/react-query'
 
 interface SettingsTabProps {
   groupDetails: Doc<'groups'> & {
@@ -17,7 +18,9 @@ interface SettingsTabProps {
 }
 
 export function SettingsTab({ groupDetails }: SettingsTabProps) {
-  const updateSettingsMutation = useMutation(api.groups.updateGroupSettings)
+  const { mutate: updateSettings } = useMutation({
+    mutationFn: useConvexMutation(api.groups.updateGroupSettings),
+  })
   const [name, setName] = useState(groupDetails.name)
   const [currency, setCurrency] = useState(groupDetails.currency)
   const [splitType, setSplitType] = useState<'EQUAL' | 'PERCENTAGES'>(
@@ -124,19 +127,26 @@ export function SettingsTab({ groupDetails }: SettingsTabProps) {
     }
 
     setIsLoading(true)
-    try {
-      await updateSettingsMutation({
+    updateSettings(
+      {
         groupId: groupDetails._id,
         name,
         currency,
         defaultSplitRatio: splitRatioPayload,
-      })
-      toast.success('Group settings updated!')
-    } catch (error: any) {
-      toast.error(`Failed to update settings: ${error.message}`)
-    } finally {
-      setIsLoading(false)
-    }
+      },
+      {
+        onSuccess: () => {
+          toast.success('Group settings updated!')
+          setIsLoading(false)
+        },
+        onError: (error: unknown) => {
+          if (error instanceof Error) {
+            toast.error(`Failed to update settings: ${error.message}`)
+          }
+          setIsLoading(false)
+        },
+      },
+    )
   }
 
   return (

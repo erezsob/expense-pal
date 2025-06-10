@@ -1,4 +1,3 @@
-import { useMutation } from 'convex/react'
 import { Id } from '../convex/_generated/dataModel'
 import { EnrichedExpense } from '../convex/expenses'
 import { api } from '../convex/_generated/api'
@@ -8,6 +7,8 @@ import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
 import { Text } from './components/ui/text'
+import { useMutation } from '@tanstack/react-query'
+import { useConvexMutation } from '@convex-dev/react-query'
 
 interface ExpensesTabProps {
   groupId: Id<'groups'>
@@ -16,7 +17,9 @@ interface ExpensesTabProps {
 }
 
 export function ExpensesTab({ groupId, expenses, currency }: ExpensesTabProps) {
-  const addExpenseMutation = useMutation(api.expenses.addExpense)
+  const { mutate: addExpense } = useMutation({
+    mutationFn: useConvexMutation(api.expenses.addExpense),
+  })
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
   const [showAddExpenseForm, setShowAddExpenseForm] = useState(false)
@@ -29,21 +32,28 @@ export function ExpensesTab({ groupId, expenses, currency }: ExpensesTabProps) {
       return
     }
     setIsLoading(true)
-    try {
-      await addExpenseMutation({
+    addExpense(
+      {
         groupId,
         description,
         amount: parseFloat(amount),
-      })
-      toast.success('Expense added!')
-      setDescription('')
-      setAmount('')
-      setShowAddExpenseForm(false)
-    } catch (error: any) {
-      toast.error(`Failed to add expense: ${error.message}`)
-    } finally {
-      setIsLoading(false)
-    }
+      },
+      {
+        onSuccess: () => {
+          toast.success('Expense added!')
+          setDescription('')
+          setAmount('')
+          setShowAddExpenseForm(false)
+          setIsLoading(false)
+        },
+        onError: (error: unknown) => {
+          if (error instanceof Error) {
+            toast.error(`Failed to add expense: ${error.message}`)
+          }
+          setIsLoading(false)
+        },
+      },
+    )
   }
 
   return (

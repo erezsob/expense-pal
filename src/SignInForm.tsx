@@ -42,6 +42,9 @@ export function SignInForm() {
           Access your account or create a new one to manage your groups.
         </Text>
       </div>
+      {flow === 'signUp' && (
+        <Input type="text" name="name" placeholder="Full Name" required />
+      )}
       <Input type="email" name="email" placeholder="Email" required />
       <Input type="password" name="password" placeholder="Password" required />
       <Button type="submit" disabled={submitting} className="w-full">

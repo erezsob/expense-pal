@@ -1,4 +1,3 @@
-import { useMutation } from 'convex/react'
 import { FormEvent, useState } from 'react'
 import { api } from '../convex/_generated/api'
 import { toast } from 'sonner'
@@ -6,8 +5,8 @@ import { Id } from '../convex/_generated/dataModel'
 import { Input } from './components/ui/input'
 import { Button } from './components/ui/button'
 import { Text } from './components/ui/text'
-import { Spacer } from './components/ui/spacer'
-import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
+import { useConvexMutation } from '@convex-dev/react-query'
+import { useMutation } from '@tanstack/react-query'
 
 interface CreateGroupFormProps {
   onSuccess: (groupId: Id<'groups'>) => void
@@ -16,7 +15,9 @@ interface CreateGroupFormProps {
 export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
   const [name, setName] = useState('')
   const [currency, setCurrency] = useState('USD')
-  const createGroup = useMutation(api.groups.createGroup)
+  const { mutate: createGroup } = useMutation({
+    mutationFn: useConvexMutation(api.groups.createGroup),
+  })
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: FormEvent) => {
@@ -26,19 +27,27 @@ export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
       return
     }
     setIsLoading(true)
-    try {
-      const groupId = await createGroup({ name, currency })
-      setName('')
-      setCurrency('USD')
-      onSuccess(groupId)
-    } catch (error: any) {
-      toast.error(
-        `Failed to create group: ${error.message || error.toString()}`,
-      )
-      console.error(error)
-    } finally {
-      setIsLoading(false)
-    }
+
+    createGroup(
+      { name, currency },
+      {
+        onSuccess: (groupId) => {
+          setName('')
+          setCurrency('USD')
+          onSuccess(groupId)
+          setIsLoading(false)
+        },
+        onError: (error: unknown) => {
+          if (error instanceof Error) {
+            toast.error(
+              `Failed to create group: ${error.message || error.toString()}`,
+            )
+            console.error(error)
+          }
+          setIsLoading(false)
+        },
+      },
+    )
   }
 
   return (

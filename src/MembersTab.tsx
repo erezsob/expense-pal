@@ -2,12 +2,13 @@ import { FormEvent } from 'react'
 import { toast } from 'sonner'
 
 import { Id } from '../convex/_generated/dataModel'
-import { useMutation } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import { useState } from 'react'
 import { Button } from './components/ui/button'
 import { Text } from './components/ui/text'
 import { Input } from './components/ui/input'
+import { useConvexMutation } from '@convex-dev/react-query'
+import { useMutation } from '@tanstack/react-query'
 
 interface MembersTabProps {
   groupId: Id<'groups'>
@@ -15,7 +16,9 @@ interface MembersTabProps {
 }
 
 export function MembersTab({ groupId, members }: MembersTabProps) {
-  const inviteUserMutation = useMutation(api.groups.inviteUserToGroup)
+  const { mutate: inviteUser } = useMutation({
+    mutationFn: useConvexMutation(api.groups.inviteUserToGroup),
+  })
   const [emailToInvite, setEmailToInvite] = useState('')
   const [isInviting, setIsInviting] = useState(false)
 
@@ -26,17 +29,24 @@ export function MembersTab({ groupId, members }: MembersTabProps) {
       return
     }
     setIsInviting(true)
-    try {
-      await inviteUserMutation({ groupId, emailToInvite })
-      toast.success(
-        `Invitation sent to ${emailToInvite} (if they are a registered user).`,
-      )
-      setEmailToInvite('')
-    } catch (error: any) {
-      toast.error(`Failed to invite user: ${error.message}`)
-    } finally {
-      setIsInviting(false)
-    }
+    inviteUser(
+      { groupId, emailToInvite },
+      {
+        onSuccess: () => {
+          toast.success(
+            `Invitation sent to ${emailToInvite} (if they are a registered user).`,
+          )
+          setEmailToInvite('')
+          setIsInviting(false)
+        },
+        onError: (error: unknown) => {
+          if (error instanceof Error) {
+            toast.error(`Failed to invite user: ${error.message}`)
+          }
+          setIsInviting(false)
+        },
+      },
+    )
   }
 
   return (

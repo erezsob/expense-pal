@@ -1,5 +1,4 @@
 import { FormEvent } from 'react'
-import { useMutation } from 'convex/react'
 import { Id } from '../convex/_generated/dataModel'
 import { EnrichedPayment } from '../convex/payments'
 import { api } from '../convex/_generated/api'
@@ -8,6 +7,8 @@ import { toast } from 'sonner'
 import { Button } from './components/ui/button'
 import { Text } from './components/ui/text'
 import { Input } from './components/ui/input'
+import { useConvexMutation } from '@convex-dev/react-query'
+import { useMutation } from '@tanstack/react-query'
 
 interface PaymentsTabProps {
   groupId: Id<'groups'>
@@ -24,7 +25,9 @@ export function PaymentsTab({
   currency,
   loggedInUserId,
 }: PaymentsTabProps) {
-  const recordPaymentMutation = useMutation(api.payments.recordPayment)
+  const { mutate: recordPayment } = useMutation({
+    mutationFn: useConvexMutation(api.payments.recordPayment),
+  })
   const [payeeUserId, setPayeeUserId] = useState<Id<'users'> | ''>('')
   const [amount, setAmount] = useState('')
   const [notes, setNotes] = useState('')
@@ -38,23 +41,30 @@ export function PaymentsTab({
       return
     }
     setIsLoading(true)
-    try {
-      await recordPaymentMutation({
+    recordPayment(
+      {
         groupId,
         payeeUserId: payeeUserId as Id<'users'>,
         amount: parseFloat(amount),
         notes: notes.trim() || undefined,
-      })
-      toast.success('Payment recorded!')
-      setPayeeUserId('')
-      setAmount('')
-      setNotes('')
-      setShowAddPaymentForm(false)
-    } catch (error: any) {
-      toast.error(`Failed to record payment: ${error.message}`)
-    } finally {
-      setIsLoading(false)
-    }
+      },
+      {
+        onSuccess: () => {
+          toast.success('Payment recorded!')
+          setPayeeUserId('')
+          setAmount('')
+          setNotes('')
+          setShowAddPaymentForm(false)
+          setIsLoading(false)
+        },
+        onError: (error: unknown) => {
+          if (error instanceof Error) {
+            toast.error(`Failed to record payment: ${error.message}`)
+          }
+          setIsLoading(false)
+        },
+      },
+    )
   }
 
   const availablePayees = members.filter((m) => m.userId !== loggedInUserId)

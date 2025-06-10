@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
 import { Text } from './components/ui/text'
 
 interface BalancesTabProps {
-  balances: GroupBalances
+  balances: GroupBalances | undefined
 }
 
 export function BalancesTab({ balances }: BalancesTabProps) {
