@@ -1,25 +1,25 @@
-import { api } from '../convex/_generated/api'
-import { Id } from '../convex/_generated/dataModel'
-import { Text } from './components/ui/text'
-import { Spacer } from './components/ui/spacer'
-import { useQuery } from '@tanstack/react-query'
-import { convexQuery } from '@convex-dev/react-query'
+import { api } from '../convex/_generated/api';
+import { Id } from '../convex/_generated/dataModel';
+import { Text } from './components/ui/text';
+import { Spacer } from './components/ui/spacer';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 
 interface GroupListProps {
-  onSelectGroup: (groupId: Id<'groups'>) => void
+  onSelectGroup: (groupId: Id<'groups'>) => void;
 }
 
 export function GroupList({ onSelectGroup }: GroupListProps) {
   const { data: groups, isLoading: isGroupsLoading } = useQuery(
     convexQuery(api.groups.getGroupsForUser, {}),
-  )
+  );
 
   if (isGroupsLoading) {
     return (
       <div className="flex items-center justify-center py-8">
         <Text variant="muted">Loading groups...</Text>
       </div>
-    )
+    );
   }
 
   if (groups?.length === 0) {
@@ -29,7 +29,7 @@ export function GroupList({ onSelectGroup }: GroupListProps) {
           You are not part of any groups yet. Create one above!
         </Text>
       </div>
-    )
+    );
   }
 
   return (
@@ -57,5 +57,5 @@ export function GroupList({ onSelectGroup }: GroupListProps) {
         </button>
       ))}
     </div>
-  )
+  );
 }

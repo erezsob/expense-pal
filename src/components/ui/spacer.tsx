@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { cn } from '@/lib/utils'
+import * as React from 'react';
+import { cn } from '@/lib/utils';
 
 interface SpacerProps extends React.HTMLAttributes<HTMLDivElement> {
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  orientation?: 'vertical' | 'horizontal'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  orientation?: 'vertical' | 'horizontal';
 }
 
 const Spacer = React.forwardRef<HTMLDivElement, SpacerProps>(
@@ -14,7 +14,7 @@ const Spacer = React.forwardRef<HTMLDivElement, SpacerProps>(
       md: 'h-6 w-6',
       lg: 'h-8 w-8',
       xl: 'h-12 w-12',
-    }
+    };
 
     return (
       <div
@@ -26,10 +26,10 @@ const Spacer = React.forwardRef<HTMLDivElement, SpacerProps>(
         )}
         {...props}
       />
-    )
+    );
   },
-)
+);
 
-Spacer.displayName = 'Spacer'
+Spacer.displayName = 'Spacer';
 
-export { Spacer }
+export { Spacer };

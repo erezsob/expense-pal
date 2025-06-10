@@ -1,15 +1,15 @@
-import { useQuery } from 'convex/react'
-import { api } from '../convex/_generated/api'
-import { toast } from 'sonner'
-import { CreateGroupForm } from './CreateGroupForm'
-import { GroupList } from './GroupList'
-import { useNavigate } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
-import { Text } from './components/ui/text'
+import { useQuery } from 'convex/react';
+import { api } from '../convex/_generated/api';
+import { toast } from 'sonner';
+import { CreateGroupForm } from './CreateGroupForm';
+import { GroupList } from './GroupList';
+import { useNavigate } from '@tanstack/react-router';
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
+import { Text } from './components/ui/text';
 
 export function Home() {
-  const loggedInUser = useQuery(api.auth.loggedInUser)
-  const navigate = useNavigate()
+  const loggedInUser = useQuery(api.auth.loggedInUser);
+  const navigate = useNavigate();
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -33,8 +33,8 @@ export function Home() {
           <CardContent>
             <CreateGroupForm
               onSuccess={(groupId) => {
-                toast.success('Group created successfully!')
-                navigate({ to: `/groups/${groupId}` })
+                toast.success('Group created successfully!');
+                navigate({ to: `/groups/${groupId}` });
               }}
             />
           </CardContent>
@@ -54,5 +54,5 @@ export function Home() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

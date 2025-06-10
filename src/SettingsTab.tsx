@@ -1,31 +1,31 @@
-import { toast } from 'sonner'
-import { FormEvent, useState } from 'react'
+import { toast } from 'sonner';
+import { FormEvent, useState } from 'react';
 
-import { Id } from '../convex/_generated/dataModel'
+import { Id } from '../convex/_generated/dataModel';
 
-import { Doc } from '../convex/_generated/dataModel'
-import { api } from '../convex/_generated/api'
+import { Doc } from '../convex/_generated/dataModel';
+import { api } from '../convex/_generated/api';
 
-import { Text } from './components/ui/text'
-import { Button } from './components/ui/button'
-import { useConvexMutation } from '@convex-dev/react-query'
-import { useMutation } from '@tanstack/react-query'
+import { Text } from './components/ui/text';
+import { Button } from './components/ui/button';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 interface SettingsTabProps {
   groupDetails: Doc<'groups'> & {
-    members: { userId: Id<'users'>; name: string; email?: string | null }[]
-  }
+    members: { userId: Id<'users'>; name: string; email?: string | null }[];
+  };
 }
 
 export function SettingsTab({ groupDetails }: SettingsTabProps) {
   const { mutate: updateSettings } = useMutation({
     mutationFn: useConvexMutation(api.groups.updateGroupSettings),
-  })
-  const [name, setName] = useState(groupDetails.name)
-  const [currency, setCurrency] = useState(groupDetails.currency)
+  });
+  const [name, setName] = useState(groupDetails.name);
+  const [currency, setCurrency] = useState(groupDetails.currency);
   const [splitType, setSplitType] = useState<'EQUAL' | 'PERCENTAGES'>(
     groupDetails.defaultSplitRatio.type,
-  )
+  );
 
   const initialPercentages =
     groupDetails.defaultSplitRatio.type === 'PERCENTAGES' &&
@@ -40,15 +40,15 @@ export function SettingsTab({ groupDetails }: SettingsTabProps) {
             splitType === 'EQUAL' && groupDetails.members.length > 0
               ? 100 / groupDetails.members.length
               : 0,
-        }))
+        }));
 
   const [percentages, setPercentages] =
-    useState<{ userId: Id<'users'>; share: number }[]>(initialPercentages)
-  const [isLoading, setIsLoading] = useState(false)
+    useState<{ userId: Id<'users'>; share: number }[]>(initialPercentages);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePercentageChange = (userId: Id<'users'>, value: string) => {
-    const newShare = parseFloat(value)
-    if (isNaN(newShare) && value !== '' && value !== '-') return
+    const newShare = parseFloat(value);
+    if (isNaN(newShare) && value !== '' && value !== '-') return;
 
     setPercentages(
       (prev) =>
@@ -60,62 +60,65 @@ export function SettingsTab({ groupDetails }: SettingsTabProps) {
               }
             : p,
         ), // Allow typing '-', treat as 0 for now
-    )
-  }
+    );
+  };
 
   const rebalancePercentages = () => {
-    if (splitType !== 'PERCENTAGES' || percentages.length === 0) return
-    const totalMembers = percentages.length
+    if (splitType !== 'PERCENTAGES' || percentages.length === 0) return;
+    const totalMembers = percentages.length;
     const equalShare =
-      totalMembers > 0 ? parseFloat((100 / totalMembers).toFixed(2)) : 0 // Ensure precision
+      totalMembers > 0 ? parseFloat((100 / totalMembers).toFixed(2)) : 0; // Ensure precision
 
     let updatedPercentages = percentages.map((p) => ({
       ...p,
       share: equalShare,
-    }))
+    }));
 
     // Adjust last member's share to ensure total is exactly 100 due to floating point issues
-    const currentTotal = updatedPercentages.reduce((sum, p) => sum + p.share, 0)
+    const currentTotal = updatedPercentages.reduce(
+      (sum, p) => sum + p.share,
+      0,
+    );
     if (totalMembers > 0 && Math.abs(currentTotal - 100) > 0.001) {
-      const difference = 100 - currentTotal
-      updatedPercentages[totalMembers - 1].share += difference
+      const difference = 100 - currentTotal;
+      updatedPercentages[totalMembers - 1].share += difference;
       updatedPercentages[totalMembers - 1].share = parseFloat(
         updatedPercentages[totalMembers - 1].share.toFixed(2),
-      )
+      );
     }
-    setPercentages(updatedPercentages)
-  }
+    setPercentages(updatedPercentages);
+  };
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!name.trim() || !currency.trim()) {
-      toast.error('Group name and currency are required.')
-      return
+      toast.error('Group name and currency are required.');
+      return;
     }
 
     let splitRatioPayload:
       | { type: 'EQUAL' }
       | {
-          type: 'PERCENTAGES'
-          percentages: { userId: Id<'users'>; share: number }[]
-        }
+          type: 'PERCENTAGES';
+          percentages: { userId: Id<'users'>; share: number }[];
+        };
 
     if (splitType === 'EQUAL') {
-      splitRatioPayload = { type: 'EQUAL' }
+      splitRatioPayload = { type: 'EQUAL' };
     } else {
       const totalPercentage = percentages.reduce(
         (sum, p) => sum + (Number(p.share) || 0),
         0,
-      )
+      );
       if (Math.abs(totalPercentage - 100) > 0.1) {
         toast.error(
           `Total percentages must sum to 100%. Current sum: ${totalPercentage.toFixed(2)}%`,
-        )
-        return
+        );
+        return;
       }
       if (percentages.some((p) => (Number(p.share) || 0) < 0)) {
-        toast.error('Percentages cannot be negative.')
-        return
+        toast.error('Percentages cannot be negative.');
+        return;
       }
       splitRatioPayload = {
         type: 'PERCENTAGES',
@@ -123,10 +126,10 @@ export function SettingsTab({ groupDetails }: SettingsTabProps) {
           userId: p.userId,
           share: (Number(p.share) || 0) / 100,
         })),
-      }
+      };
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     updateSettings(
       {
         groupId: groupDetails._id,
@@ -136,18 +139,18 @@ export function SettingsTab({ groupDetails }: SettingsTabProps) {
       },
       {
         onSuccess: () => {
-          toast.success('Group settings updated!')
-          setIsLoading(false)
+          toast.success('Group settings updated!');
+          setIsLoading(false);
         },
         onError: (error: unknown) => {
           if (error instanceof Error) {
-            toast.error(`Failed to update settings: ${error.message}`)
+            toast.error(`Failed to update settings: ${error.message}`);
           }
-          setIsLoading(false)
+          setIsLoading(false);
         },
       },
-    )
-  }
+    );
+  };
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto w-full max-w-lg space-y-6">
@@ -247,5 +250,5 @@ export function SettingsTab({ groupDetails }: SettingsTabProps) {
         {isLoading ? 'Saving...' : 'Save Settings'}
       </Button>
     </form>
-  )
+  );
 }

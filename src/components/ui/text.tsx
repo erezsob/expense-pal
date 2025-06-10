@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { cn } from '@/lib/utils'
+import * as React from 'react';
+import { cn } from '@/lib/utils';
 
 interface TextProps extends React.HTMLAttributes<HTMLParagraphElement> {
-  variant?: 'default' | 'muted' | 'subtle' | 'lead' | 'large' | 'small'
-  as?: 'p' | 'span' | 'div'
+  variant?: 'default' | 'muted' | 'subtle' | 'lead' | 'large' | 'small';
+  as?: 'p' | 'span' | 'div';
 }
 
 const Text = React.forwardRef<HTMLParagraphElement, TextProps>(
@@ -15,7 +15,7 @@ const Text = React.forwardRef<HTMLParagraphElement, TextProps>(
       lead: 'text-xl text-muted-foreground',
       large: 'text-lg font-semibold',
       small: 'text-sm text-muted-foreground',
-    }
+    };
 
     return (
       <Component
@@ -23,10 +23,10 @@ const Text = React.forwardRef<HTMLParagraphElement, TextProps>(
         className={cn(variantStyles[variant], className)}
         {...props}
       />
-    )
+    );
   },
-)
+);
 
-Text.displayName = 'Text'
+Text.displayName = 'Text';
 
-export { Text }
+export { Text };

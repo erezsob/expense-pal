@@ -1,9 +1,9 @@
-import { GroupBalances } from '../convex/balances'
-import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
-import { Text } from './components/ui/text'
+import { GroupBalances } from '../convex/balances';
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
+import { Text } from './components/ui/text';
 
 interface BalancesTabProps {
-  balances: GroupBalances | undefined
+  balances: GroupBalances | undefined;
 }
 
 export function BalancesTab({ balances }: BalancesTabProps) {
@@ -16,7 +16,7 @@ export function BalancesTab({ balances }: BalancesTabProps) {
           </Text>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -87,5 +87,5 @@ export function BalancesTab({ balances }: BalancesTabProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

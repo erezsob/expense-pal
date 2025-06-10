@@ -1,36 +1,36 @@
-import { useAuthActions } from '@convex-dev/auth/react'
-import { useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
-import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Text } from './components/ui/text'
+import { useAuthActions } from '@convex-dev/auth/react';
+import { useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Text } from './components/ui/text';
 
 export function SignInForm() {
-  const navigate = useNavigate()
-  const { signIn } = useAuthActions()
-  const [flow, setFlow] = useState<'signIn' | 'signUp'>('signIn')
-  const [submitting, setSubmitting] = useState(false)
+  const navigate = useNavigate();
+  const { signIn } = useAuthActions();
+  const [flow, setFlow] = useState<'signIn' | 'signUp'>('signIn');
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setSubmitting(true)
-    const formData = new FormData(e.target as HTMLFormElement)
-    formData.set('flow', flow)
+    e.preventDefault();
+    setSubmitting(true);
+    const formData = new FormData(e.target as HTMLFormElement);
+    formData.set('flow', flow);
     signIn('password', formData).catch((error) => {
-      let toastTitle = ''
+      let toastTitle = '';
       if (error.message.includes('Invalid password')) {
-        toastTitle = 'Invalid password. Please try again.'
+        toastTitle = 'Invalid password. Please try again.';
       } else {
         toastTitle =
           flow === 'signIn'
             ? 'Could not sign in, did you mean to sign up?'
-            : 'Could not sign up, did you mean to sign in?'
+            : 'Could not sign up, did you mean to sign in?';
       }
-      toast.error(toastTitle)
-      setSubmitting(false)
-    })
-  }
+      toast.error(toastTitle);
+      setSubmitting(false);
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md space-y-5">
@@ -73,13 +73,13 @@ export function SignInForm() {
         <Button
           className="auth-button w-full"
           onClick={() => {
-            signIn('anonymous')
-            navigate({ to: '/' })
+            signIn('anonymous');
+            navigate({ to: '/' });
           }}
         >
           Sign in anonymously
         </Button>
       </div>
     </form>
-  )
+  );
 }

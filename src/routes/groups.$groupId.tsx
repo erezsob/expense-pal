@@ -1,48 +1,48 @@
-import { toast } from 'sonner'
+import { toast } from 'sonner';
 
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Id } from '../../convex/_generated/dataModel'
-import { convexQuery } from '@convex-dev/react-query'
-import { api } from '../../convex/_generated/api'
-import { Doc } from '../../convex/_generated/dataModel'
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { Id } from '../../convex/_generated/dataModel';
+import { convexQuery } from '@convex-dev/react-query';
+import { api } from '../../convex/_generated/api';
+import { Doc } from '../../convex/_generated/dataModel';
 
-import { ExpensesTab } from '../ExpensesTab'
-import { MembersTab } from '../MembersTab'
-import { BalancesTab } from '../BalancesTab'
-import { SettingsTab } from '../SettingsTab'
-import { Spinner } from '@/components/ui/spinner'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
-import { Text } from '@/components/ui/text'
-import { Card, CardContent } from '@/components/ui/card'
-import { useQuery } from '@tanstack/react-query'
+import { ExpensesTab } from '../ExpensesTab';
+import { MembersTab } from '../MembersTab';
+import { BalancesTab } from '../BalancesTab';
+import { SettingsTab } from '../SettingsTab';
+import { Spinner } from '@/components/ui/spinner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
+import { Card, CardContent } from '@/components/ui/card';
+import { useQuery } from '@tanstack/react-query';
 
 export const Route = createFileRoute('/groups/$groupId')({
   component: GroupView,
-})
+});
 
-const TABS = ['expenses', 'members', 'balances', 'settings'] as const
+const TABS = ['expenses', 'members', 'balances', 'settings'] as const;
 
 export function GroupView() {
-  const { groupId: groupIdString } = Route.useParams()
-  const groupId = groupIdString as Id<'groups'>
+  const { groupId: groupIdString } = Route.useParams();
+  const groupId = groupIdString as Id<'groups'>;
 
   const { data: groupDetails, isLoading: isGroupDetailsLoading } = useQuery(
     convexQuery(api.groups.getGroupDetails, { groupId }),
-  )
+  );
 
   const { data: expenses, isLoading: isExpensesLoading } = useQuery(
     convexQuery(api.expenses.getExpensesForGroup, { groupId }),
-  )
+  );
   const { data: balances, isLoading: isBalancesLoading } = useQuery(
     convexQuery(api.balances.getGroupBalances, { groupId }),
-  )
+  );
   const { data: loggedInUser, isLoading: isLoggedInUserLoading } = useQuery(
     convexQuery(api.auth.loggedInUser, {}),
-  )
+  );
 
-  const navigate = useNavigate()
-  const handleBackClick = () => navigate({ to: '/' })
+  const navigate = useNavigate();
+  const handleBackClick = () => navigate({ to: '/' });
 
   if (
     isGroupDetailsLoading ||
@@ -54,19 +54,19 @@ export function GroupView() {
       <div className="flex h-64 items-center justify-center">
         <Spinner />
       </div>
-    )
+    );
   }
 
   if (!groupDetails || balances === null || !loggedInUser) {
-    toast.error('Group details or balances could not be loaded.')
-    handleBackClick()
+    toast.error('Group details or balances could not be loaded.');
+    handleBackClick();
     return (
       <div className="flex h-64 items-center justify-center">
         <p className="text-error">
           Error loading group data. Please try again.
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -113,8 +113,8 @@ export function GroupView() {
                 groupId={groupId}
                 members={
                   groupDetails.members as {
-                    userId: Id<'users'>
-                    name: string
+                    userId: Id<'users'>;
+                    name: string;
                   }[]
                 }
               />
@@ -127,10 +127,10 @@ export function GroupView() {
                 groupDetails={
                   groupDetails as Doc<'groups'> & {
                     members: {
-                      userId: Id<'users'>
-                      name: string
-                      email?: string | null
-                    }[]
+                      userId: Id<'users'>;
+                      name: string;
+                      email?: string | null;
+                    }[];
                   }
                 }
               />
@@ -139,5 +139,5 @@ export function GroupView() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

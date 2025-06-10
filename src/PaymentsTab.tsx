@@ -1,21 +1,21 @@
-import { FormEvent } from 'react'
-import { Id } from '../convex/_generated/dataModel'
-import { EnrichedPayment } from '../convex/payments'
-import { api } from '../convex/_generated/api'
-import { useState } from 'react'
-import { toast } from 'sonner'
-import { Button } from './components/ui/button'
-import { Text } from './components/ui/text'
-import { Input } from './components/ui/input'
-import { useConvexMutation } from '@convex-dev/react-query'
-import { useMutation } from '@tanstack/react-query'
+import { FormEvent } from 'react';
+import { Id } from '../convex/_generated/dataModel';
+import { EnrichedPayment } from '../convex/payments';
+import { api } from '../convex/_generated/api';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from './components/ui/button';
+import { Text } from './components/ui/text';
+import { Input } from './components/ui/input';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 interface PaymentsTabProps {
-  groupId: Id<'groups'>
-  payments: EnrichedPayment[]
-  members: { userId: Id<'users'>; name: string }[]
-  currency: string
-  loggedInUserId: Id<'users'>
+  groupId: Id<'groups'>;
+  payments: EnrichedPayment[];
+  members: { userId: Id<'users'>; name: string }[];
+  currency: string;
+  loggedInUserId: Id<'users'>;
 }
 
 export function PaymentsTab({
@@ -27,20 +27,20 @@ export function PaymentsTab({
 }: PaymentsTabProps) {
   const { mutate: recordPayment } = useMutation({
     mutationFn: useConvexMutation(api.payments.recordPayment),
-  })
-  const [payeeUserId, setPayeeUserId] = useState<Id<'users'> | ''>('')
-  const [amount, setAmount] = useState('')
-  const [notes, setNotes] = useState('')
-  const [showAddPaymentForm, setShowAddPaymentForm] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  });
+  const [payeeUserId, setPayeeUserId] = useState<Id<'users'> | ''>('');
+  const [amount, setAmount] = useState('');
+  const [notes, setNotes] = useState('');
+  const [showAddPaymentForm, setShowAddPaymentForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRecordPayment = async (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!payeeUserId || !amount.trim() || parseFloat(amount) <= 0) {
-      toast.error('Valid payee and positive amount are required.')
-      return
+      toast.error('Valid payee and positive amount are required.');
+      return;
     }
-    setIsLoading(true)
+    setIsLoading(true);
     recordPayment(
       {
         groupId,
@@ -50,24 +50,24 @@ export function PaymentsTab({
       },
       {
         onSuccess: () => {
-          toast.success('Payment recorded!')
-          setPayeeUserId('')
-          setAmount('')
-          setNotes('')
-          setShowAddPaymentForm(false)
-          setIsLoading(false)
+          toast.success('Payment recorded!');
+          setPayeeUserId('');
+          setAmount('');
+          setNotes('');
+          setShowAddPaymentForm(false);
+          setIsLoading(false);
         },
         onError: (error: unknown) => {
           if (error instanceof Error) {
-            toast.error(`Failed to record payment: ${error.message}`)
+            toast.error(`Failed to record payment: ${error.message}`);
           }
-          setIsLoading(false)
+          setIsLoading(false);
         },
       },
-    )
-  }
+    );
+  };
 
-  const availablePayees = members.filter((m) => m.userId !== loggedInUserId)
+  const availablePayees = members.filter((m) => m.userId !== loggedInUserId);
 
   return (
     <div className="space-y-4">
@@ -177,5 +177,5 @@ export function PaymentsTab({
         </ul>
       )}
     </div>
-  )
+  );
 }

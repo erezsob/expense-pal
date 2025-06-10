@@ -1,53 +1,53 @@
-import { FormEvent } from 'react'
-import { toast } from 'sonner'
+import { FormEvent } from 'react';
+import { toast } from 'sonner';
 
-import { Id } from '../convex/_generated/dataModel'
-import { api } from '../convex/_generated/api'
-import { useState } from 'react'
-import { Button } from './components/ui/button'
-import { Text } from './components/ui/text'
-import { Input } from './components/ui/input'
-import { useConvexMutation } from '@convex-dev/react-query'
-import { useMutation } from '@tanstack/react-query'
+import { Id } from '../convex/_generated/dataModel';
+import { api } from '../convex/_generated/api';
+import { useState } from 'react';
+import { Button } from './components/ui/button';
+import { Text } from './components/ui/text';
+import { Input } from './components/ui/input';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 interface MembersTabProps {
-  groupId: Id<'groups'>
-  members: { userId: Id<'users'>; name: string; email?: string | null }[]
+  groupId: Id<'groups'>;
+  members: { userId: Id<'users'>; name: string; email?: string | null }[];
 }
 
 export function MembersTab({ groupId, members }: MembersTabProps) {
   const { mutate: inviteUser } = useMutation({
     mutationFn: useConvexMutation(api.groups.inviteUserToGroup),
-  })
-  const [emailToInvite, setEmailToInvite] = useState('')
-  const [isInviting, setIsInviting] = useState(false)
+  });
+  const [emailToInvite, setEmailToInvite] = useState('');
+  const [isInviting, setIsInviting] = useState(false);
 
   const handleInviteUser = async (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!emailToInvite.trim()) {
-      toast.error('Email is required to invite a user.')
-      return
+      toast.error('Email is required to invite a user.');
+      return;
     }
-    setIsInviting(true)
+    setIsInviting(true);
     inviteUser(
       { groupId, emailToInvite },
       {
         onSuccess: () => {
           toast.success(
             `Invitation sent to ${emailToInvite} (if they are a registered user).`,
-          )
-          setEmailToInvite('')
-          setIsInviting(false)
+          );
+          setEmailToInvite('');
+          setIsInviting(false);
         },
         onError: (error: unknown) => {
           if (error instanceof Error) {
-            toast.error(`Failed to invite user: ${error.message}`)
+            toast.error(`Failed to invite user: ${error.message}`);
           }
-          setIsInviting(false)
+          setIsInviting(false);
         },
       },
-    )
-  }
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -97,5 +97,5 @@ export function MembersTab({ groupId, members }: MembersTabProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

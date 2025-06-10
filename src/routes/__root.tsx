@@ -1,8 +1,8 @@
-import { ModeToggle } from '../components/mode-toggle'
-import { SignOutButton } from '@/SignOutButton'
-import { createRootRoute, Outlet } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { Toaster } from 'sonner'
+import { ModeToggle } from '../components/mode-toggle';
+import { SignOutButton } from '@/SignOutButton';
+import { createRootRoute, Outlet } from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { Toaster } from 'sonner';
 
 export const Route = createRootRoute({
   component: () => (
@@ -25,4 +25,4 @@ export const Route = createRootRoute({
       <TanStackRouterDevtools />
     </>
   ),
-})
+});

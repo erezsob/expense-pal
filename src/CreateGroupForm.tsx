@@ -1,54 +1,54 @@
-import { FormEvent, useState } from 'react'
-import { api } from '../convex/_generated/api'
-import { toast } from 'sonner'
-import { Id } from '../convex/_generated/dataModel'
-import { Input } from './components/ui/input'
-import { Button } from './components/ui/button'
-import { Text } from './components/ui/text'
-import { useConvexMutation } from '@convex-dev/react-query'
-import { useMutation } from '@tanstack/react-query'
+import { FormEvent, useState } from 'react';
+import { api } from '../convex/_generated/api';
+import { toast } from 'sonner';
+import { Id } from '../convex/_generated/dataModel';
+import { Input } from './components/ui/input';
+import { Button } from './components/ui/button';
+import { Text } from './components/ui/text';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 interface CreateGroupFormProps {
-  onSuccess: (groupId: Id<'groups'>) => void
+  onSuccess: (groupId: Id<'groups'>) => void;
 }
 
 export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
-  const [name, setName] = useState('')
-  const [currency, setCurrency] = useState('USD')
+  const [name, setName] = useState('');
+  const [currency, setCurrency] = useState('USD');
   const { mutate: createGroup } = useMutation({
     mutationFn: useConvexMutation(api.groups.createGroup),
-  })
-  const [isLoading, setIsLoading] = useState(false)
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!name.trim() || !currency.trim()) {
-      toast.error('Group name and currency are required.')
-      return
+      toast.error('Group name and currency are required.');
+      return;
     }
-    setIsLoading(true)
+    setIsLoading(true);
 
     createGroup(
       { name, currency },
       {
         onSuccess: (groupId) => {
-          setName('')
-          setCurrency('USD')
-          onSuccess(groupId)
-          setIsLoading(false)
+          setName('');
+          setCurrency('USD');
+          onSuccess(groupId);
+          setIsLoading(false);
         },
         onError: (error: unknown) => {
           if (error instanceof Error) {
             toast.error(
               `Failed to create group: ${error.message || error.toString()}`,
-            )
-            console.error(error)
+            );
+            console.error(error);
           }
-          setIsLoading(false)
+          setIsLoading(false);
         },
       },
-    )
-  }
+    );
+  };
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md space-y-6">
@@ -85,5 +85,5 @@ export function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
         {isLoading ? 'Creating...' : 'Create Group'}
       </Button>
     </form>
-  )
+  );
 }
